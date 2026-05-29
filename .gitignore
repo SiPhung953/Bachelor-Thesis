@@ -1,0 +1,75 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+coverage/
+
+# TypeScript / tooling cache
+*.tsbuildinfo
+.eslintcache
+.vite/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+!.env.local.example
+!.env.development.example
+!.env.production.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Runtime / temporary files
+tmp/
+temp/
+.cache/
+
+# Prisma
+apps/api/prisma/migrations/dev.db
+apps/api/prisma/migrations/dev.db-journal
+apps/api/prisma/*.db
+apps/api/prisma/*.db-journal
+
+# Generated files
+apps/api/src/generated/
+apps/api/src/routes/routes.ts
+apps/api/src/swagger.json
+
+# Uploads / local storage
+uploads/
+apps/api/uploads/
+apps/api/storage/
+apps/web/public/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Package manager
+package-lock.json
+yarn.lock
+
+# Test artifacts
+playwright-report/
+test-results/
+
+# Docker / local database volumes
+.docker/
+docker-data/
+postgres-data/
