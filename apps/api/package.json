@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsoa spec-and-routes && tsc",
     "start": "node dist/server.js"
   },
   "keywords": [],
