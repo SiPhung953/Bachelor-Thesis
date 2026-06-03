@@ -91,7 +91,6 @@ export class AuthService {
     }
 
     // forgotPassword happen within /auth (Login/Register screen), maybe within /me (Current profile) in the future
-
     // forgotPassword should be divided into 2 methods: requestPasswordReset() and resetPassword()
 
     // TODO: 
