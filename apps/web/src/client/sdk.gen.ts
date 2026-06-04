@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthenticateUserData, AuthenticateUserResponses, LogoutUserData, LogoutUserResponses, RegisterUserData, RegisterUserResponses, RequestPasswordResetData, RequestPasswordResetResponses, ResetPasswordData, ResetPasswordResponses } from './types.gen';
+import type { AuthenticateUserData, AuthenticateUserResponses, LogoutUserData, LogoutUserResponses, RegisterUserData, RegisterUserResponses, RequestPasswordResetData, RequestPasswordResetResponses, ResetPasswordData, ResetPasswordResponses, ValidateResetTokenData, ValidateResetTokenResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -62,4 +62,10 @@ export const resetPassword = <ThrowOnError extends boolean = false>(options: Opt
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+export const validateResetToken = <ThrowOnError extends boolean = false>(options: Options<ValidateResetTokenData, ThrowOnError>) => (options.client ?? client).get<ValidateResetTokenResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    url: '/auth/reset-password/validate',
+    ...options
 });

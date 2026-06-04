@@ -81,13 +81,30 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
       // 3. Notify parent (App.tsx) of successful login
       onLoginSuccess(data.user.email)
     } catch (error) {
-      // Error handling
-      const err = error as { response?: { data?: { message?: string } }; message?: string };
-      const errMsg =
-        err.response?.data?.message ||
-        err.message ||
-        "Authentication failed. Please check your credentials."
-      setErrors({ general: errMsg })
+      // Enhanced error handling for various backend responses
+      const err: any = error;
+      let errMsg = "Authentication failed. Please check your credentials.";
+      if (err.response?.data?.message) {
+        errMsg = err.response.data.message;
+      } else if (err.response?.status) {
+        switch (err.response.status) {
+          case 400:
+            errMsg = "Invalid request.";
+            break;
+          case 401:
+          case 404:
+            errMsg = "Invalid email or password.";
+            break;
+          case 403:
+            errMsg = "Your account has been banned.";
+            break;
+          default:
+            errMsg = `Request failed with status code ${err.response.status}`;
+        }
+      } else if (err.message) {
+        errMsg = err.message;
+      }
+      setErrors({ general: errMsg });
     } finally {
       setIsLoading(false)
     }

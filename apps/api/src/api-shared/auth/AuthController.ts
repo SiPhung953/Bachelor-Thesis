@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Post,
+  Get,
+  Query,
   Route,
   SuccessResponse,
   Tags,
@@ -63,4 +65,12 @@ export class AuthController extends Controller {
         this.setStatus(200);
         return new AuthService().resetPassword(requestBody);
     }
-}
+
+    @SuccessResponse("200", "OK")
+    @Get("reset-password/validate")
+    public async validateResetToken(
+        @Query() token: string
+    ): Promise<{ valid: boolean }> {
+        return new AuthService().validateResetToken(token);
+}
+}

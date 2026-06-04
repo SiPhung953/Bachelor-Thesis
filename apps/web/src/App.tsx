@@ -5,6 +5,7 @@ import ForgotPasswordPage from "@/ui-shared/auth/ForgotPasswordPage"
 import RegisterPage from "@/ui-shared/auth/RegisterPage"
 import LandingPage from "@/ui-external/landing/LandingPage"
 import DashboardPage from "@/ui-internal/dashboard/DashboardPage"
+import ResetPasswordPage from "./ui-shared/auth/ResetPassword"
 
 function AppContent() {
   const navigate = useNavigate()
@@ -60,6 +61,7 @@ function AppContent() {
       />
 
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       {/* Protected Dashboard Route */}
       <Route

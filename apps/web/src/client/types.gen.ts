@@ -133,3 +133,23 @@ export type ResetPasswordResponses = {
 };
 
 export type ResetPasswordResponse2 = ResetPasswordResponses[keyof ResetPasswordResponses];
+
+export type ValidateResetTokenData = {
+    body?: never;
+    path?: never;
+    query: {
+        token: string;
+    };
+    url: '/auth/reset-password/validate';
+};
+
+export type ValidateResetTokenResponses = {
+    /**
+     * OK
+     */
+    200: {
+        valid: boolean;
+    };
+};
+
+export type ValidateResetTokenResponse = ValidateResetTokenResponses[keyof ValidateResetTokenResponses];

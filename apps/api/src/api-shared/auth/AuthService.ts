@@ -17,6 +17,8 @@ import { EmailService } from "../email/EmailService";
 
 const passwordHasher = new PasswordHasher();
 const JWT_SECRET = process.env.JWT_SECRET || "default-jwt-secret-key-for-dev";
+const RESET_TOKEN_EXPIRY_TIME = Number(process.env.RESET_TOKEN_EXPIRY_TIME) || 15;
+const PASSWORD_RESET_MESSAGE = String(process.env.PASSWORD_RESET_MESSAGE);
 
 export class HttpError extends Error {
     constructor(public statusCode: number, message: string) {
@@ -36,7 +38,7 @@ export class AuthService {
 
         // 2. If user does not exist, reject login
         if (!user) {
-            throw new Error("Invalid email or password");
+            throw new HttpError(404, "Invalid email or password.");
         }
 
         // 3. Compare loginRequest.password with user.passwordHash
@@ -44,12 +46,12 @@ export class AuthService {
 
         // 4. If password invalid, reject login
         if (!isPasswordValid) {
-            throw new Error("Invalid email or password");
+            throw new HttpError(401, "Invalid email or password.");
         }
 
         // 5. Check user status
-        if (user.status === "Banned") {
-            throw new Error("User account is banned");
+        if (user.status.toLowerCase() === "banned") {
+            throw new HttpError(403, "Your account has been banned.");
         }
 
         // 6. Generate access token
@@ -117,7 +119,7 @@ export class AuthService {
         // 2. If user does not exist, send a response
         if (!user) {
             return {
-                message: `${process.env.PASSWORD_RESET_MESSAGE}`
+                message: PASSWORD_RESET_MESSAGE,
             };
         }
 
@@ -130,7 +132,7 @@ export class AuthService {
             data: {
                 userId: user.id,
                 tokenHash: tokenHash,
-                expiresAt: new Date(Date.now() + 15 * 60 * 1000)
+                expiresAt: new Date(Date.now() + RESET_TOKEN_EXPIRY_TIME * 60 * 1000)
             }
         });
 
@@ -139,7 +141,7 @@ export class AuthService {
         await this.emailService.sendPasswordResetEmail(user.email, resetUrl);
 
         return {
-            message: `${process.env.PASSWORD_RESET_MESSAGE}`,
+            message: PASSWORD_RESET_MESSAGE,
         };
     }
 
@@ -158,9 +160,9 @@ export class AuthService {
             }
         });
 
-        // 3. If the token is invalid, already used, expired
+        // 3. If the token is invalid, already used
         if (!resetTokenRecord) {
-            throw new Error("Invalid or expired reset token");
+            throw new HttpError(400, "Invalid or expired reset token");
         }
 
         // 4. Hash the new password
@@ -182,4 +184,24 @@ export class AuthService {
             message: "Password reset successful."
         };
     }
+
+    // The user can access the reset-password page, even when the token is invalidated
+    // The user can't reset the password, but the fact that the UI is renderable is annoying
+    public async validateResetToken(token: string): Promise<{ valid: boolean }> {
+    const tokenHash = ResetTokenUtils.hash(token);
+
+    const resetTokenRecord = await prisma.passwordResetToken.findFirst({
+        where: {
+            tokenHash,
+            usedAt: null,
+            expiresAt: {
+                gt: new Date(),
+            },
+        },
+    });
+
+    return {
+        valid: resetTokenRecord !== null,
+    };
+}
 }
