@@ -39,7 +39,6 @@ export type LogoutResponse = {
 
 export type ForgotPasswordResponse = {
     message: string;
-    resetToken?: string;
 };
 
 export type ForgotPasswordRequest = {

@@ -9,9 +9,11 @@ import { ResetPasswordRequest } from "./ResetPasswordRequest";
 import { ResetPasswordResponse } from "./ResetPasswordResponse";
 
 import { prisma } from "../../lib/prisma.js";
+import jwt from "jsonwebtoken";
+
 import { PasswordHasher } from "../../utils/PasswordHasher";
 import { ResetTokenUtils } from "../../utils/ResetTokenUtils";
-import jwt from "jsonwebtoken";
+import { EmailService } from "../email/EmailService";
 
 const passwordHasher = new PasswordHasher();
 const JWT_SECRET = process.env.JWT_SECRET || "default-jwt-secret-key-for-dev";
@@ -24,6 +26,8 @@ export class HttpError extends Error {
 }
 
 export class AuthService {
+    constructor(private readonly emailService: EmailService = new EmailService()) {}
+
     public async login(loginRequest: LoginRequest): Promise<LoginResponse> {
         // 1. Find user by email
         const user = await prisma.user.findUnique({
@@ -104,30 +108,16 @@ export class AuthService {
         }
     }
 
-    // forgotPassword happen within /auth (Login/Register screen), maybe within /me (Current profile) in the future
-    // forgotPassword should be divided into 2 methods: requestPasswordReset() and resetPassword()
-
-    // TODO: 
-    // Create new utils for token generation and hash
-        // Generate a opaque random reset token
-            // import crypto from "node:crypto"
-            // crypto.randomBytes(32).toString("base64url")
-        // Hash the token
-            // crypto.createHash("sha265")
-    // Create new Prisma model for token storage
-        // id, userId, tokenHash, expiresAt (After 15 mins), createdAt
-    // DTOs for ForgotPasswordRequest, ForgotPasswordResponse (this one will hold the raw token), ResetPasswordRequest, ResetPasswordResponse
-
     public async requestPasswordReset(request: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
         // 1. Find user by email
         const user = await prisma.user.findUnique({
             where: { email: request.email }
         });
 
-        // 2. If user does not exist, send a response:
+        // 2. If user does not exist, send a response
         if (!user) {
             return {
-                message: "If an account with this email exists, password reset instructions have been sent."
+                message: `${process.env.PASSWORD_RESET_MESSAGE}`
             };
         }
 
@@ -144,17 +134,20 @@ export class AuthService {
             }
         });
 
+        // 5. Send email to user
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${rawToken}`;
+        await this.emailService.sendPasswordResetEmail(user.email, resetUrl);
+
         return {
-            message: "If an account with this email exists, password reset instructions have been sent.",
-            resetToken: rawToken
+            message: `${process.env.PASSWORD_RESET_MESSAGE}`,
         };
     }
 
     public async resetPassword(request: ResetPasswordRequest): Promise<ResetPasswordResponse> {
-        // 1. Request body will contain raw token, hash the raw token
+        // 1. Hash submitted raw token
         const tokenHash = ResetTokenUtils.hash(request.token);
 
-        // 2. Find the token in DB
+        // 2. Find valid token record in DB
         const resetTokenRecord = await prisma.passwordResetToken.findFirst({
             where: {
                 tokenHash: tokenHash,
@@ -165,7 +158,7 @@ export class AuthService {
             }
         });
 
-        // 3. If the token is already used or expired, throw Error
+        // 3. If the token is invalid, already used, expired
         if (!resetTokenRecord) {
             throw new Error("Invalid or expired reset token");
         }

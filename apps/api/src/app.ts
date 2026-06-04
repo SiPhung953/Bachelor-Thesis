@@ -9,9 +9,11 @@ import swaggerDocument from "./generated/swagger.json"
 
 export const app = express();
 
+const FRONTEND_URL = process.env.FRONTEND_URL
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
