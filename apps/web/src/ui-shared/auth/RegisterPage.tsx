@@ -74,19 +74,12 @@ export default function RegisterPage() {
     if (!validate()) return
     setIsLoading(true)
 
-    // // Mock registration — replace with real API call when backend is ready
-    // setTimeout(() => {
-    //   setIsLoading(false)
-    //   alert("Account created successfully! You can now sign in.")
-    //   navigate("/login")
-    // }, 1500)
     try {
       await registerUser({
         body: {
           email,
           password,
-          roleId: 1 
-          // In the future: 1: Job Seeker, 2: Employer, 3: SysAdmin
+          // roleId is assigned server‑side (default 1) – do not send from client
         },
         throwOnError: true
       });
@@ -162,11 +155,10 @@ export default function RegisterPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     disabled={isLoading}
-                    className={`h-10 pl-9 text-sm ${
-                      errors.name
+                    className={`h-10 pl-9 text-sm ${errors.name
                         ? "border-destructive focus-visible:ring-destructive/20"
                         : "border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"
-                    }`}
+                      }`}
                     required
                   />
                 </div>
@@ -191,11 +183,10 @@ export default function RegisterPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
-                    className={`h-10 pl-9 text-sm ${
-                      errors.email
+                    className={`h-10 pl-9 text-sm ${errors.email
                         ? "border-destructive focus-visible:ring-destructive/20"
                         : "border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"
-                    }`}
+                      }`}
                     required
                   />
                 </div>
@@ -244,11 +235,10 @@ export default function RegisterPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={isLoading}
-                      className={`h-10 pl-9 pr-10 text-sm ${
-                        errors.password
+                      className={`h-10 pl-9 pr-10 text-sm ${errors.password
                           ? "border-destructive focus-visible:ring-destructive/20"
                           : "border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"
-                      }`}
+                        }`}
                       required
                     />
                     <button
@@ -282,11 +272,10 @@ export default function RegisterPage() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       disabled={isLoading}
-                      className={`h-10 pl-9 pr-10 text-sm ${
-                        errors.confirmPassword
+                      className={`h-10 pl-9 pr-10 text-sm ${errors.confirmPassword
                           ? "border-destructive focus-visible:ring-destructive/20"
                           : "border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"
-                      }`}
+                        }`}
                       required
                     />
                     <button

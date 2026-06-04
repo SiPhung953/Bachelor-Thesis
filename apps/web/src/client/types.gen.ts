@@ -31,7 +31,6 @@ export type RegisterResponse = {
 export type RegisterRequest = {
     email: string;
     password: string;
-    roleId: number;
 };
 
 export type LogoutResponse = {

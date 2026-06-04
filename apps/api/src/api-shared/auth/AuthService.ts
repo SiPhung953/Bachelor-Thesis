@@ -16,6 +16,13 @@ import jwt from "jsonwebtoken";
 const passwordHasher = new PasswordHasher();
 const JWT_SECRET = process.env.JWT_SECRET || "default-jwt-secret-key-for-dev";
 
+export class HttpError extends Error {
+    constructor(public statusCode: number, message: string) {
+        super(message);
+        this.name = "HttpError";
+    }
+}
+
 export class AuthService {
     public async login(loginRequest: LoginRequest): Promise<LoginResponse> {
         // 1. Find user by email
@@ -61,23 +68,30 @@ export class AuthService {
     }
 
     public async register(registerRequest: RegisterRequest): Promise<RegisterResponse> {
-        const passwordHash = await passwordHasher.hash(registerRequest.password)
+        // Check for existing email to avoid duplicates
+        const existing = await prisma.user.findUnique({
+          where: { email: registerRequest.email },
+        });
+        if (existing) {
+          throw new HttpError(400, "Email already registered");
+        }
+        const passwordHash = await passwordHasher.hash(registerRequest.password);
         const registeredUser = await prisma.user.create({
-            data: {
-                email: registerRequest.email,
-                roleId: registerRequest.roleId,
-                passwordHash: passwordHash
-            },
-            select: { 
-                id: true,
-                email: true,
-                roleId: true,
-                status: true
-            }
+          data: {
+            email: registerRequest.email,
+            roleId: 1, // TODO: replace with lookup from Role table when implemented
+            passwordHash: passwordHash,
+          },
+          select: {
+            id: true,
+            email: true,
+            roleId: true,
+            status: true,
+          },
         });
         return {
-            user: registeredUser,
-        }
+          user: registeredUser,
+        };
     }
     
     public logout(): LogoutResponse {

@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // for consistency, not used
+  // const [showPassword, setShowPassword] = useState(false); // for consistency, not used
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
