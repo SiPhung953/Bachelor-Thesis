@@ -16,6 +16,7 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
 
   passwordResetTokens PasswordResetToken[]
+  job                 Job[]
 
   @@map("users")
 }
@@ -30,7 +31,60 @@ model PasswordResetToken {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("password_reset_tokens")
   @@index([userId])
   @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model Job {
+  id                  String         @id @default(uuid())
+  createdByEmployerId String         @map("created_by_employer_id")
+  companyId           String         @map("company_id")
+  title               String
+  description         String
+  requirement         String
+  employmentType      EmploymentType @map("employment_type")
+  location            String
+  status              JobStatus
+  deadline            DateTime
+  createdAt           DateTime       @map("created_at")
+  updatedAt           DateTime?      @map("updated_at")
+  closedAt            DateTime       @map("closed_at")
+  deletedAt           DateTime?      @map("deleted_at")
+  approvedAt          DateTime?      @map("approved_at")
+  rejectedAt          DateTime?      @map("rejected_at")
+  rejectionReason     String?        @map("rejection_reason")
+
+  user    User    @relation(fields: [createdByEmployerId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@map("jobs")
+}
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  district  String?
+  city      String
+  createdAt DateTime @map("created_at")
+  updatedAt DateTime @map("updated_at")
+
+  job Job[]
+
+  @@map("companies")
+}
+
+enum EmploymentType {
+  ON_SITE
+  REMOTE
+  HYBRID
+}
+
+enum JobStatus {
+  PENDING_APPROVAL
+  ACTIVE
+  REJECTED
+  CLOSED
+  EXPIRED
+  DELETED
 }
