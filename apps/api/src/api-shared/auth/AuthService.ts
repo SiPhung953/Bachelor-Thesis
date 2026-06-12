@@ -8,24 +8,18 @@ import { ForgotPasswordResponse } from "./ForgotPasswordResponse";
 import { ResetPasswordRequest } from "./ResetPasswordRequest";
 import { ResetPasswordResponse } from "./ResetPasswordResponse";
 
-import { prisma } from "../../lib/prisma.js";
+import { prisma } from "../../lib/prisma";
 import jwt from "jsonwebtoken";
 
 import { PasswordHasher } from "../../utils/PasswordHasher";
 import { ResetTokenUtils } from "../../utils/ResetTokenUtils";
 import { EmailService } from "../email/EmailService";
+import { HttpError } from "../../utils/HttpError";
 
 const passwordHasher = new PasswordHasher();
 const JWT_SECRET = process.env.JWT_SECRET || "default-jwt-secret-key-for-dev";
 const RESET_TOKEN_EXPIRY_TIME = Number(process.env.RESET_TOKEN_EXPIRY_TIME) || 15;
 const PASSWORD_RESET_MESSAGE = String(process.env.PASSWORD_RESET_MESSAGE);
-
-export class HttpError extends Error {
-    constructor(public statusCode: number, message: string) {
-        super(message);
-        this.name = "HttpError";
-    }
-}
 
 export class AuthService {
     constructor(private readonly emailService: EmailService = new EmailService()) {}
