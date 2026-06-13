@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react"
+import { Link } from "react-router-dom"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -16,6 +17,15 @@ interface Job {
   posted: string
   skills: string[]
 }
+
+const companyIdMap: Record<string, string> = {
+  "Google": "google",
+  "Stanford AI Lab": "stanford-ai-lab",
+  "McKinsey & Company": "mckinsey",
+  "Figma": "figma",
+  "Stripe": "stripe",
+  "Vercel": "vercel"
+};
 
 interface FeaturedJobsProps {
   searchKeyword: string
@@ -133,9 +143,9 @@ export default function FeaturedJobs({ searchKeyword, searchLocation, onResetSea
     })
   }, [activeTab, searchKeyword, searchLocation])
 
-  const handleApplyClick = (jobTitle: string, company: string) => {
-    alert(`Mock Application initiated for "${jobTitle}" at ${company}. Ready for integration with job application features.`)
-  }
+  // const handleApplyClick = (jobTitle: string, company: string) => {
+  //   alert(`Mock Application initiated for "${jobTitle}" at ${company}. Ready for integration with job application features.`)
+  // }
 
   return (
     <section className="bg-background py-20 font-sans" id="search-jobs">
@@ -205,10 +215,14 @@ export default function FeaturedJobs({ searchKeyword, searchLocation, onResetSea
                   </div>
                   <div className="space-y-1">
                     <CardTitle className="text-sm font-bold text-foreground group-hover:text-brand transition-colors line-clamp-1">
-                      {job.title}
+                      <Link to={`/jobs/${job.id}`} className="hover:underline">
+                        {job.title}
+                      </Link>
                     </CardTitle>
                     <CardDescription className="text-xs font-semibold text-foreground/80">
-                      {job.company}
+                      <Link to={`/companies/${companyIdMap[job.company] || "google"}`} className="text-brand hover:underline">
+                        {job.company}
+                      </Link>
                     </CardDescription>
                   </div>
                 </CardHeader>
@@ -248,14 +262,15 @@ export default function FeaturedJobs({ searchKeyword, searchLocation, onResetSea
                   <Badge className="bg-brand/10 border border-brand/20 text-brand text-[10px] font-bold uppercase tracking-wider rounded-none px-2 py-0.5">
                     {job.type}
                   </Badge>
-                  <Button
-                    onClick={() => handleApplyClick(job.title, job.company)}
-                    variant="link"
-                    className="h-auto p-0 text-xs font-bold uppercase tracking-wider text-brand hover:text-brand/80 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform cursor-pointer"
-                  >
-                    <span>Apply Now</span>
-                    <ArrowRight size={12} weight="bold" />
-                  </Button>
+                  <Link to={`/jobs/${job.id}`}>
+                    <Button
+                      variant="link"
+                      className="h-auto p-0 text-xs font-bold uppercase tracking-wider text-brand hover:text-brand/80 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform cursor-pointer"
+                    >
+                      <span>View Details</span>
+                      <ArrowRight size={12} weight="bold" />
+                    </Button>
+                  </Link>
                 </CardFooter>
               </Card>
             ))}

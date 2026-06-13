@@ -4,6 +4,44 @@ export type ClientOptions = {
     baseURL: `${string}://${string}` | (string & {});
 };
 
+export type JobListItemDto = {
+    id: string;
+    title: string;
+    description?: string;
+    employmentType: string;
+    location: string;
+};
+
+export type SearchJobsResponse = {
+    items: Array<JobListItemDto>;
+};
+
+export type SearchJobsQuery = {
+    keyword?: string;
+    location?: string;
+};
+
+export type CompanyProfileDto = {
+    id: string;
+    name: string;
+    city: string;
+    district?: string | null;
+};
+
+export type EmploymentType = 'ON_SITE' | 'REMOTE' | 'HYBRID';
+
+export type CompanyJobListItemDto = {
+    id: string;
+    title: string;
+    employmentType: EmploymentType;
+    location: string;
+};
+
+export type CompanyProfileResponse = {
+    company: CompanyProfileDto;
+    jobs: Array<CompanyJobListItemDto>;
+};
+
 export type LoginResponse = {
     accessToken: string;
     user: {
@@ -53,6 +91,43 @@ export type ResetPasswordRequest = {
     token: string;
     newPassword: string;
 };
+
+export type SearchJobsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        keyword?: string;
+        location?: string;
+    };
+    url: '/jobs';
+};
+
+export type SearchJobsResponses = {
+    /**
+     * OK
+     */
+    200: SearchJobsResponse;
+};
+
+export type SearchJobsResponse2 = SearchJobsResponses[keyof SearchJobsResponses];
+
+export type GetCompanyProfileData = {
+    body?: never;
+    path: {
+        companyId: string;
+    };
+    query?: never;
+    url: '/companies/{companyId}';
+};
+
+export type GetCompanyProfileResponses = {
+    /**
+     * OK
+     */
+    200: CompanyProfileResponse;
+};
+
+export type GetCompanyProfileResponse = GetCompanyProfileResponses[keyof GetCompanyProfileResponses];
 
 export type AuthenticateUserData = {
     body: LoginRequest;

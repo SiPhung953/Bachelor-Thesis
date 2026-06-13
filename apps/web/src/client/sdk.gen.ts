@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthenticateUserData, AuthenticateUserResponses, LogoutUserData, LogoutUserResponses, RegisterUserData, RegisterUserResponses, RequestPasswordResetData, RequestPasswordResetResponses, ResetPasswordData, ResetPasswordResponses, ValidateResetTokenData, ValidateResetTokenResponses } from './types.gen';
+import type { AuthenticateUserData, AuthenticateUserResponses, GetCompanyProfileData, GetCompanyProfileResponses, LogoutUserData, LogoutUserResponses, RegisterUserData, RegisterUserResponses, RequestPasswordResetData, RequestPasswordResetResponses, ResetPasswordData, ResetPasswordResponses, SearchJobsData, SearchJobsResponses, ValidateResetTokenData, ValidateResetTokenResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -17,6 +17,18 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: Record<string, unknown>;
 };
+
+export const searchJobs = <ThrowOnError extends boolean = false>(options?: Options<SearchJobsData, ThrowOnError>) => (options?.client ?? client).get<SearchJobsResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    url: '/jobs',
+    ...options
+});
+
+export const getCompanyProfile = <ThrowOnError extends boolean = false>(options: Options<GetCompanyProfileData, ThrowOnError>) => (options.client ?? client).get<GetCompanyProfileResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    url: '/companies/{companyId}',
+    ...options
+});
 
 export const authenticateUser = <ThrowOnError extends boolean = false>(options: Options<AuthenticateUserData, ThrowOnError>) => (options.client ?? client).post<AuthenticateUserResponses, unknown, ThrowOnError>({
     responseType: 'json',

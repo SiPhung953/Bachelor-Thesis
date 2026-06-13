@@ -6,6 +6,8 @@ import RegisterPage from "@/ui-shared/auth/RegisterPage"
 import LandingPage from "@/ui-external/landing/LandingPage"
 import DashboardPage from "@/ui-internal/dashboard/DashboardPage"
 import ResetPasswordPage from "./ui-shared/auth/ResetPassword"
+import JobDetailPage from "@/ui-external/public/JobDetailPage"
+import CompanyProfilePage from "@/ui-external/public/CompanyProfilePage"
 
 function AppContent() {
   const navigate = useNavigate()
@@ -41,6 +43,12 @@ function AppContent() {
     <Routes>
       {/* Public Landing Page */}
       <Route path="/" element={<LandingPage />} />
+
+      {/* Public Job Details Page */}
+      <Route path="/jobs/:jobId" element={<JobDetailPage />} />
+
+      {/* Public Company Profile Page */}
+      <Route path="/companies/:companyId" element={<CompanyProfilePage />} />
 
       {/* Public Registration Page */}
       <Route
