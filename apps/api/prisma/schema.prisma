@@ -15,14 +15,14 @@ model User {
   status       String   @default("ACTIVE")
   createdAt    DateTime @default(now()) @map("created_at")
 
-  roles Role @relation(fields: [roleId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
 
   passwordResetTokens PasswordResetToken[]
   jobs                Job[]
-  userProfiles        userProfile?
+  userProfile         userProfile?
   // Due to Prisma limitation, we cannot enforce the rule of: "Each User must have one UserProfile"
   // What we can enforce, is commented at model userProfile.
-  userJobPreferences  userJobPreference?
+  userJobPreference   userJobPreference?
 
   @@map("users")
 }
@@ -70,8 +70,8 @@ model Job {
   rejectedAt          DateTime?      @map("rejected_at")
   rejectionReason     String?        @map("rejection_reason")
 
-  users     User    @relation(fields: [createdByEmployerId], references: [id])
-  companies Company @relation(fields: [companyId], references: [id])
+  user    User    @relation(fields: [createdByEmployerId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
 
   @@map("jobs")
 }
@@ -100,7 +100,7 @@ model userProfile {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @default(now()) @map("updated_at")
 
-  users User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
   // We can enfore that:
   // "Each userProfile must belong to only one user"
   // "Each user can have at most one userProfile"
@@ -117,7 +117,7 @@ model userJobPreference {
   desiredJobTitle   String            @map("desired_job_title")
   preferredLocation String            @map("preffered_location")
 
-  users User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@map("user_job_preference")
 }
