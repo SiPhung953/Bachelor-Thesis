@@ -75,11 +75,27 @@ export class AuthService {
         if (existing) {
           throw new HttpError(400, "Email already registered");
         }
+
+        // Before: hard coding roleId assignment to 1
+        // This is created so that if I were to fuck up the Database
+        // Then the new user can still register and got the default role.
+        const defaultRole = await prisma.role.findUnique({
+            where: {
+                name: "JOB_SEEKER",
+            },
+            select: {
+                id: true,
+            },
+            });
+        if (!defaultRole) {
+            throw new Error("Default role JOB_SEEKER is not seeded");
+        }
+
         const passwordHash = await passwordHasher.hash(registerRequest.password);
         const registeredUser = await prisma.user.create({
           data: {
             email: registerRequest.email,
-            roleId: 1, // TODO: replace with lookup from Role table when implemented
+            roleId: defaultRole.id,
             passwordHash: passwordHash,
           },
           select: {
