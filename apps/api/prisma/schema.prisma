@@ -15,10 +15,25 @@ model User {
   status       String   @default("ACTIVE")
   createdAt    DateTime @default(now()) @map("created_at")
 
+  roles Role @relation(fields: [roleId], references: [id])
+
   passwordResetTokens PasswordResetToken[]
-  job                 Job[]
+  jobs                Job[]
+  userProfiles        userProfile?
+  // Due to Prisma limitation, we cannot enforce the rule of: "Each User must have one UserProfile"
+  // What we can enforce, is commented at model userProfile.
+  userJobPreferences  userJobPreference?
 
   @@map("users")
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  users User[]
+
+  @@map("roles")
 }
 
 model PasswordResetToken {
@@ -29,7 +44,7 @@ model PasswordResetToken {
   usedAt    DateTime? @map("used_at")
   createdAt DateTime  @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
@@ -55,8 +70,8 @@ model Job {
   rejectedAt          DateTime?      @map("rejected_at")
   rejectionReason     String?        @map("rejection_reason")
 
-  user    User    @relation(fields: [createdByEmployerId], references: [id])
-  company Company @relation(fields: [companyId], references: [id])
+  users     User    @relation(fields: [createdByEmployerId], references: [id])
+  companies Company @relation(fields: [companyId], references: [id])
 
   @@map("jobs")
 }
@@ -69,9 +84,42 @@ model Company {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
 
-  job Job[]
+  jobs Job[]
 
   @@map("companies")
+}
+
+model userProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  fullName    String   @map("full_name")
+  headline    String?
+  summary     String?
+  phoneNumber String?  @map("phone_number")
+  city        String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  users User @relation(fields: [userId], references: [id])
+  // We can enfore that:
+  // "Each userProfile must belong to only one user"
+  // "Each user can have at most one userProfile"
+  // Both of these are enforcable since userId is unique
+
+  @@map("user_profiles")
+}
+
+model userJobPreference {
+  id                String            @id @default(uuid())
+  userId            String            @unique @map("user_id")
+  profileVisibility profileVisibility @map("profile_visibility")
+  jobSearchStatus   jobSearchStatus   @map("job_search_status")
+  desiredJobTitle   String            @map("desired_job_title")
+  preferredLocation String            @map("preffered_location")
+
+  users User @relation(fields: [userId], references: [id])
+
+  @@map("user_job_preference")
 }
 
 enum EmploymentType {
@@ -87,4 +135,15 @@ enum JobStatus {
   CLOSED
   EXPIRED
   DELETED
+}
+
+enum profileVisibility {
+  PUBLIC
+  VISIBLE_TO_EMPLOYER
+  PRIVATE
+}
+
+enum jobSearchStatus {
+  OPEN_FOR_JOBS
+  CLOSED
 }
