@@ -1,16 +1,12 @@
 import type { NextFunction, Request, Response } from 'express';
 import { JwtService } from '../utils/JwtService';
 import { prisma } from '../lib/prisma';
+import { CurrentUser } from '../security/CurrentAuthenticatedUser';
 
 const jwtService = new JwtService();
 
 export interface AuthenticatedRequest extends Request {
-    currentUser?: {
-        id: string;
-        email: string;
-        roleId: number;
-        status: string;
-    };
+    currentUser?: CurrentUser;
 }
 
 export async function authMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction) {
