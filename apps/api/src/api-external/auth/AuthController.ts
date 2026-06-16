@@ -23,13 +23,15 @@ import { ResetPasswordResponse } from "./ResetPasswordResponse";
 @Tags("Auth")
 @Route("auth")
 export class AuthController extends Controller {
+    private readonly authService = new AuthService();
+
     @SuccessResponse("200", "OK")
     @Post("login")
     public async authenticateUser(
         @Body() requestBody: LoginRequest
     ): Promise<LoginResponse> {
         this.setStatus(200);
-        return new AuthService().login(requestBody);
+        return this.authService.login(requestBody);
     }
 
     @SuccessResponse("201", "Created")
@@ -38,14 +40,14 @@ export class AuthController extends Controller {
         @Body() requestBody: RegisterRequest
     ): Promise<RegisterResponse> {
         this.setStatus(201);
-        return new AuthService().register(requestBody);
+        return this.authService.register(requestBody);
     }
 
     @SuccessResponse("200", "OK")
     @Post("logout")
     public async logoutUser(): Promise<LogoutResponse> {
         this.setStatus(200);
-        return new AuthService().logout();
+        return this.authService.logout();
     }
 
     @SuccessResponse("200", "OK")
@@ -54,7 +56,7 @@ export class AuthController extends Controller {
         @Body() requestBody: ForgotPasswordRequest
     ): Promise<ForgotPasswordResponse> {
         this.setStatus(200);
-        return new AuthService().requestPasswordReset(requestBody);
+        return this.authService.requestPasswordReset(requestBody);
     }
 
     @SuccessResponse("200", "OK")
@@ -63,7 +65,7 @@ export class AuthController extends Controller {
         @Body() requestBody: ResetPasswordRequest
     ): Promise<ResetPasswordResponse> {
         this.setStatus(200);
-        return new AuthService().resetPassword(requestBody);
+        return this.authService.resetPassword(requestBody);
     }
 
     @SuccessResponse("200", "OK")
@@ -71,6 +73,6 @@ export class AuthController extends Controller {
     public async validateResetToken(
         @Query() token: string
     ): Promise<{ valid: boolean }> {
-        return new AuthService().validateResetToken(token);
+        return this.authService.validateResetToken(token);
 }
 }
