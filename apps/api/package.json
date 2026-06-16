@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsoa spec-and-routes && tsc && shx mkdir -p dist/api-shared/email/templates && shx cp -r src/api-shared/email/templates/. dist/api-shared/email/templates/",
+    "build": "tsoa spec-and-routes && tsc && shx mkdir -p dist/api-external/email/templates && shx cp -r src/api-external/email/templates/. dist/api-shared/email/templates/",
     "start": "node dist/server.js"
   },
   "keywords": [],
