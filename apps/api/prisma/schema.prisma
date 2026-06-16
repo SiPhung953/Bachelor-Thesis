@@ -140,11 +140,11 @@ enum JobStatus {
 
 enum profileVisibility {
   PUBLIC
-  VISIBLE_TO_EMPLOYER
+  VISIBLE_TO_EMPLOYERS
   PRIVATE
 }
 
 enum jobSearchStatus {
-  OPEN_FOR_JOBS
-  CLOSED
+  OPEN_TO_WORK
+  NOT_LOOKING
 }
