@@ -1,8 +1,8 @@
 import { SearchJobsQuery } from './SearchJobsQuery';
 import { SearchJobsResponse } from './SearchJobsResponse';
 
-import { prisma } from '../../../lib/prisma';
-import { HttpError } from '../../../utils/HttpError';
+import { prisma } from '../../lib/prisma';
+import { HttpError } from '../../utils/HttpError';
 
 export class JobDiscoveryService {
     public async searchJobs(query: SearchJobsQuery): Promise<SearchJobsResponse> {

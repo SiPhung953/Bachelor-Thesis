@@ -2,8 +2,8 @@ import { CompanyProfileResponse } from './CompanyProfileResponse';
 import { CompanyProfileDto } from './CompanyProfileDto';
 import { CompanyJobListItemDto } from './CompanyJobListItemDto';
 
-import { prisma } from '../../../lib/prisma';
-import { HttpError } from '../../../utils/HttpError';
+import { prisma } from '../../lib/prisma';
+import { HttpError } from '../../utils/HttpError';
 
 export class CompanyProfileService {
     public async getCompanyProfile(companyId: string): Promise<CompanyProfileResponse> {

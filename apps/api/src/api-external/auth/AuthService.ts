@@ -9,15 +9,15 @@ import { ResetPasswordRequest } from "./ResetPasswordRequest";
 import { ResetPasswordResponse } from "./ResetPasswordResponse";
 
 import { prisma } from "../../lib/prisma";
-import jwt from "jsonwebtoken";
+import { JwtService } from "../../utils/JwtService";
 
 import { PasswordHasher } from "../../utils/PasswordHasher";
 import { ResetTokenUtils } from "../../utils/ResetTokenUtils";
-import { EmailService } from "../email/EmailService";
+import { EmailService } from "../../email/EmailService";
 import { HttpError } from "../../utils/HttpError";
 
 const passwordHasher = new PasswordHasher();
-const JWT_SECRET = process.env.JWT_SECRET || "default-jwt-secret-key-for-dev";
+const jwtService = new JwtService();
 const RESET_TOKEN_EXPIRY_TIME = Number(process.env.RESET_TOKEN_EXPIRY_TIME) || 15;
 const PASSWORD_RESET_MESSAGE = String(process.env.PASSWORD_RESET_MESSAGE);
 
@@ -49,10 +49,8 @@ export class AuthService {
         }
 
         // 6. Generate access token
-        const accessToken = jwt.sign(
-            { id: user.id, email: user.email, roleId: user.roleId },
-            JWT_SECRET,
-            { expiresIn: "1d" }
+        const accessToken = jwtService.sign(
+            { id: user.id, email: user.email, roleId: user.roleId }
         );
 
         // 7. Return accessToken + safe user data
