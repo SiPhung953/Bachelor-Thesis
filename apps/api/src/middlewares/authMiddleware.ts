@@ -40,7 +40,7 @@ export async function authMiddleware(req: AuthenticatedRequest, res: Response, n
         }
 
         req.currentUser = user;
-        next();
+        return next();
     } catch {
         return res.status(401).json({ message: "Invalid access token "});
     }
