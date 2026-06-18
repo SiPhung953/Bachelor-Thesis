@@ -115,13 +115,22 @@ export class ProfileService {
                     preferredLocation: requestBody.preferredLocation,
                 }),
             },
-            // For create, provide default values for required fields.
+            // FIX: No need to enforce double default unless necessary
+            // The database have already provide default values
             create: {
                 userId,
-                profileVisibility: requestBody.profileVisibility ?? "VISIBLE_TO_EMPLOYERS",
-                jobSearchStatus: requestBody.jobSearchStatus ?? "OPEN_TO_WORK",
-                desiredJobTitle: requestBody.desiredJobTitle ?? null,
-                preferredLocation: requestBody.preferredLocation ?? null,
+                ...(requestBody.profileVisibility !== undefined && {
+                    profileVisibility: requestBody.profileVisibility,
+                }),
+                ...(requestBody.jobSearchStatus !== undefined && {
+                    jobSearchStatus: requestBody.jobSearchStatus,
+                }),
+                ...(requestBody.desiredJobTitle !== undefined && {
+                    desiredJobTitle: requestBody.desiredJobTitle,
+                }),
+                ...(requestBody.preferredLocation !== undefined && {
+                    preferredLocation: requestBody.preferredLocation,
+                }),
             },
             select: {
                 profileVisibility: true,
