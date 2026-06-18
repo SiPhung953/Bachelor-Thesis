@@ -1,19 +1,28 @@
+import "dotenv/config";
+
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = String(process.env.JWT_SECRET) || "default-jwt-secret-key-for-dev";
+function getJwtSecret(): string {
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+        throw new Error("JWT_SECRET is not defined");
+    }
+
+    return secret;
+}
+
+const JWT_SECRET = getJwtSecret();
 
 export interface JwtPayload {
-    id: string;
+    userId: string;
     email: string;
     roleId: number;
 }
 
 export class JwtService {
     public sign(payload: JwtPayload): string {
-        const accessToken = jwt.sign(payload, JWT_SECRET, { 
-            expiresIn: "1d" 
-        });
-        return accessToken;
+        return jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" });
     }
 
     public verify(token: string): JwtPayload {

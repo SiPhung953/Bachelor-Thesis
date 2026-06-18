@@ -50,7 +50,7 @@ export class AuthService {
 
         // 6. Generate access token
         const accessToken = jwtService.sign(
-            { id: user.id, email: user.email, roleId: user.roleId }
+            { userId: user.id, email: user.email, roleId: user.roleId }
         );
 
         // 7. Return accessToken + safe user data
