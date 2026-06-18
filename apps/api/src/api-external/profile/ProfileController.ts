@@ -7,13 +7,24 @@ import {
   SuccessResponse,
   Tags,
   Security,
-  Request
+  Request // This Request is a decorator, different from ExpressRequest
 } from "tsoa";
+import { Request as ExpressRequest } from 'express';
+
 import { ProfileService } from './ProfileService';
 
-import { AuthenticatedRequest } from '../../middlewares/authMiddleware';
+import { CurrentUser } from "../../security/CurrentAuthenticatedUser";
 import { UpdateJobPreferencesRequest } from './UpdateJobPreferenceRequest';
 import { UpdatePersonalInformationRequest } from './UpdatePersonalInformationRequest';
+
+// Helper interface to extend tsoa's Request object
+// Tsoa will automatically infer this when security is applied
+interface AuthenticatedRequest extends ExpressRequest {
+  currentUser: CurrentUser;
+  // In the previous version, we have currentUser?: CurrentUser (currentUser may be undefined)
+  // But since the controller is now protected by @Security("jwt")
+  // We assume that authentication already succeeded (currentUser is always defined)
+}
 
 @Tags("Users")
 @Route("users/me")

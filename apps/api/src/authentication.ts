@@ -3,6 +3,8 @@ import "dotenv/config";
 import { Request, Response } from 'express';
 import { JwtService } from "./utils/JwtService";
 import { prisma } from './lib/prisma';
+import { HttpError } from './utils/HttpError';
+
 import { CurrentUser } from './security/CurrentAuthenticatedUser';
 
 interface JwtPayload {
@@ -13,26 +15,20 @@ interface AuthenticatedRequest extends Request {
     currentUser?: CurrentUser;
 }
 
-function createError(message: string, status: number) {
-    const error = new Error(message) as Error & { status?: number };
-    error.status = status;
-    return error;
-}
-
 export async function expressAuthentication(
     request: Request,
     securityName: string,
-    scopes?: string[],
-    response?: Response
+    _scopes?: string[],
+    _response?: Response
 ): Promise<CurrentUser> {
     if (securityName !== "jwt") {
-        throw createError("Unsupported authentication method", 401);
+        throw new HttpError(401, "Unsupported authentication method");
     }
 
     const authorization = request.headers.authorization;
 
     if (!authorization || !authorization.startsWith("Bearer ")) {
-        throw createError("Missing access token", 401);
+        throw new HttpError(401, "Missing access token");
     }
 
     const token = authorization.replace("Bearer ", "");
@@ -43,7 +39,7 @@ export async function expressAuthentication(
     try {
         payload = jwtService.verify(token);
     } catch {
-        throw createError("Invalid access token", 401);
+        throw new HttpError(401, "Invalid access token");
     }
 
     const user = await prisma.user.findUnique({
@@ -57,11 +53,11 @@ export async function expressAuthentication(
     });
 
     if (!user) {
-        throw createError("Invalid access token", 401);
+        throw new HttpError(401, "Invalid access token");
     }
 
-    if (user.status == "BANNED") {
-        throw createError("User is banned", 403);
+    if (user.status.toLowerCase() === "banned") {
+        throw new HttpError(403, "Account is banned");
     }
 
     const currentUser: CurrentUser = {
