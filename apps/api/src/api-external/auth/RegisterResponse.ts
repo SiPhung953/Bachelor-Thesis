@@ -3,6 +3,6 @@ export interface RegisterResponse {
         id: string;
         email: string;
         roleId: number;
-        status: string;
+        status: "ACTIVE" | "BANNED";
     }
 }
