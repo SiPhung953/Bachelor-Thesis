@@ -17,6 +17,7 @@ import {
   Buildings,
 } from "@phosphor-icons/react";
 import { mockJobs, mockCompanies } from "./mockData";
+// TODO: Replace mock data with real data from API using fetch
 
 export default function JobDetailPage() {
   const { jobId } = useParams<{ jobId: string }>();
@@ -42,7 +43,7 @@ export default function JobDetailPage() {
         <main className="flex-1 flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto">
           <WarningCircle size={48} className="text-muted-foreground mb-4 opacity-75" />
           <h2 className="text-xl font-extrabold uppercase tracking-tight text-foreground mb-2">
-            Job Opportunity Not Found
+            Job Not Found
           </h2>
           <p className="text-xs text-muted-foreground mb-6">
             The job posting you are looking for may have been removed, or the link you followed is incorrect.

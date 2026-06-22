@@ -15,6 +15,8 @@ import {
   Info
 } from "@phosphor-icons/react";
 import { mockJobs, mockCompanies } from "./mockData";
+// TODO: Replace mock data with real data from API using fetch
+// TODO: Write a function to derive first letter of company name
 
 export default function CompanyProfilePage() {
   const { companyId } = useParams<{ companyId: string }>();
