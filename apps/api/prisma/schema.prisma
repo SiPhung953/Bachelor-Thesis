@@ -20,10 +20,12 @@ model User {
 
   passwordResetTokens PasswordResetToken[]
   jobs                Job[]
+  companies           Company?
   userProfile         userProfile?
   // Due to Prisma limitation, we cannot enforce the rule of: "Each User must have one UserProfile"
   // What we can enforce, is commented at model userProfile.
   userJobPreference   userJobPreference?
+  resumes             Resume[]
 
   @@map("users")
 }
@@ -71,21 +73,24 @@ model Job {
   rejectedAt          DateTime?      @map("rejected_at")
   rejectionReason     String?        @map("rejection_reason")
 
-  user    User    @relation(fields: [createdByEmployerId], references: [id])
-  company Company @relation(fields: [companyId], references: [id])
+  createdByEmployer User    @relation(fields: [createdByEmployerId], references: [id])
+  company           Company @relation(fields: [companyId], references: [id])
 
   @@map("jobs")
 }
 
 model Company {
-  id        String   @id @default(uuid())
-  name      String
-  district  String?
-  city      String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  id              String   @id @default(uuid())
+  ownerEmployerId String   @unique @map("owner_employer_id")
+  name            String
+  district        String?
+  city            String
+  description     String
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
 
-  jobs Job[]
+  ownerEmployer User  @relation(fields: [ownerEmployerId], references: [id])
+  jobs          Job[]
 
   @@map("companies")
 }
@@ -113,8 +118,8 @@ model userProfile {
 model userJobPreference {
   id                String            @id @default(uuid())
   userId            String            @unique @map("user_id")
-  profileVisibility profileVisibility @default(VISIBLE_TO_EMPLOYERS) @map("profile_visibility")
-  jobSearchStatus   jobSearchStatus   @default(OPEN_TO_WORK) @map("job_search_status")
+  profileVisibility ProfileVisibility @default(VISIBLE_TO_EMPLOYERS) @map("profile_visibility")
+  jobSearchStatus   JobSearchStatus   @default(OPEN_TO_WORK) @map("job_search_status")
   desiredJobTitle   String?           @map("desired_job_title")
   preferredLocation String?           @map("preffered_location")
   updatedAt         DateTime          @default(now()) @map("updated_at")
@@ -122,6 +127,31 @@ model userJobPreference {
   user User @relation(fields: [userId], references: [id])
 
   @@map("user_job_preference")
+}
+
+model Resume {
+  id         String         @id @default(uuid())
+  userId     String
+  title      String
+  fileUrl    String         @map("file_url")
+  fileType   ResumeFileType @map("file_type")
+  fileSize   Int            @map("file_size")
+  uploadedAt DateTime       @default(now()) @map("uploaded_at")
+  deletedAt  DateTime?      @map("deleted_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+  applications Application[]
+
+  @@map("resumes")
+}
+
+model Application {
+  id       String @id @default(uuid())
+  userId   String
+  jobId    String
+  resumeId String
+
+  resume Resume @relation(fields: [resumeId], references: [id])
 }
 
 enum UserStatus {
@@ -144,12 +174,18 @@ enum JobStatus {
   DELETED
 }
 
-enum profileVisibility {
+enum ProfileVisibility {
   PRIVATE
   VISIBLE_TO_EMPLOYERS
 }
 
-enum jobSearchStatus {
+enum JobSearchStatus {
   OPEN_TO_WORK
   NOT_LOOKING
+}
+
+enum ResumeFileType {
+  PDF
+  DOC
+  DOCX
 }
