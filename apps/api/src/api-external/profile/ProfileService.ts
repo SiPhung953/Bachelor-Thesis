@@ -29,6 +29,7 @@ export class ProfileService {
                 phoneNumber: true,
                 city: true,
                 summary: true,
+                avatarUrl: true,
                 updatedAt: true,
             },
         });
