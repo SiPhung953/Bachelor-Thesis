@@ -96,15 +96,16 @@ model Company {
 }
 
 model userProfile {
-  id          String   @id @default(uuid())
-  userId      String   @unique @map("user_id")
-  fullName    String?  @map("full_name")
+  id          String    @id @default(uuid())
+  userId      String    @unique @map("user_id")
+  fullName    String?   @map("full_name")
+  dateOfBirth DateTime? @map("date_of_birth")
   headline    String?
   summary     String?
-  phoneNumber String?  @map("phone_number")
+  phoneNumber String?   @map("phone_number")
   city        String?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id])
   // We can enfore that:
@@ -146,21 +147,21 @@ model Resume {
 }
 
 model Application {
-  id       String @id @default(uuid())
-  userId   String
-  jobId    String
-  resumeId String
-  status ApplicationStatus
-  appliedAt DateTime @default(now())
-  underReviewAt DateTime?
-  updatedAt DateTime @updatedAt
+  id              String            @id @default(uuid())
+  userId          String
+  jobId           String
+  resumeId        String
+  status          ApplicationStatus
+  appliedAt       DateTime          @default(now())
+  underReviewAt   DateTime?
+  updatedAt       DateTime          @updatedAt
   rejectionReason String?
-  withdrawnAt DateTime?
+  withdrawnAt     DateTime?
 
   resume Resume @relation(fields: [resumeId], references: [id])
 
-  @@map("applications")
   @@unique([userId, jobId])
+  @@map("applications")
 }
 
 enum UserStatus {

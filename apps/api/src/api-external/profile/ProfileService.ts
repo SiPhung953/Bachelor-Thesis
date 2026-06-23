@@ -21,6 +21,7 @@ export class ProfileService {
             // Those field can be empty, as the user have yet to update them
             select: {
                 fullName: true,
+                dateOfBirth: true,
                 headline: true,
                 phoneNumber: true,
                 city: true,
@@ -46,6 +47,7 @@ export class ProfileService {
             // As in, they have update their profile before/they have created their profile
             update: {
                 fullName: requestBody.fullName,
+                dateOfBirth: requestBody.dateOfBirth,
                 headline: requestBody.headline,
                 phoneNumber: requestBody.phoneNumber,
                 city: requestBody.city,
@@ -55,6 +57,7 @@ export class ProfileService {
             create: {
                 userId,
                 fullName: requestBody.fullName,
+                dateOfBirth: requestBody.dateOfBirth,
                 headline: requestBody.headline,
                 phoneNumber: requestBody.phoneNumber,
                 city: requestBody.city,
@@ -64,6 +67,7 @@ export class ProfileService {
             // Once again, normal user can't modify date/logs stuff 
             select: {
                 fullName: true,
+                dateOfBirth: true,
                 headline: true,
                 phoneNumber: true,
                 city: true,
