@@ -26,6 +26,7 @@ import {
   Trash,
   Warning,
   File,
+  Camera,
 } from "@phosphor-icons/react"
 import {
   getMyProfile,
@@ -36,6 +37,7 @@ import {
   uploadResume,
   deleteResume,
   changePassword,
+  changeAvatar,
 } from "@/client"
 import type {
   ResumeDto,
@@ -119,7 +121,7 @@ function ToggleGroup<T extends string>({
   disabled?: boolean
 }) {
   return (
-    <div className="flex border border-foreground/15 overflow-hidden w-full sm:w-auto">
+    <div className="flex border border-foreground/15 overflow-hidden w-full grid grid-cols-2 sm:w-auto">
       {options.map((opt, i) => (
         <button
           key={opt.value}
@@ -228,6 +230,11 @@ export default function ProfilePage({ userEmail }: ProfilePageProps) {
   const [piSuccess, setPiSuccess] = useState("")
   const [piError, setPiError] = useState("")
 
+  const [avatarUrl, setAvatarUrl] = useState("")
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [avatarError, setAvatarError] = useState("")
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     getMyProfile({ throwOnError: true })
       .then((res) => {
@@ -243,11 +250,46 @@ export default function ProfilePage({ userEmail }: ProfilePageProps) {
             headline: p.headline ?? "",
             summary: p.summary ?? "",
           })
+          const url = (p as any).avatarUrl || localStorage.getItem(`profile_avatar_${userEmail}`) || ""
+          setAvatarUrl(url)
         }
       })
       .catch(() => {})
       .finally(() => setPiLoading(false))
-  }, [])
+  }, [userEmail])
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const allowed = ["image/jpeg", "image/jpg", "image/png"]
+    if (!allowed.includes(file.type)) {
+      setAvatarError("Only JPG, JPEG, and PNG images are allowed.")
+      return
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      setAvatarError("Image file must not exceed 3MB.")
+      return
+    }
+
+    setAvatarError("")
+    setAvatarUploading(true)
+    try {
+      const res = await changeAvatar({
+        body: { file },
+        throwOnError: true,
+      })
+      if (res.data?.avatarUrl) {
+        setAvatarUrl(res.data.avatarUrl)
+        localStorage.setItem(`profile_avatar_${userEmail}`, res.data.avatarUrl)
+      }
+    } catch (err: any) {
+      setAvatarError(err?.response?.data?.message ?? "Failed to upload avatar. Please try again.")
+    } finally {
+      setAvatarUploading(false)
+      if (avatarInputRef.current) avatarInputRef.current.value = ""
+    }
+  }
 
   const validatePi = () => {
     const errs: Record<string, string> = {}
@@ -402,7 +444,7 @@ export default function ProfilePage({ userEmail }: ProfilePageProps) {
     setCvUploading(true)
     try {
       await uploadResume({
-        body: { title: cvTitle.trim(), file: cvFile },
+        body: { resumeTitle: cvTitle.trim(), resumeFile: cvFile },
         throwOnError: true,
       })
       setCvUploadSuccess("CV uploaded successfully.")
@@ -494,29 +536,6 @@ export default function ProfilePage({ userEmail }: ProfilePageProps) {
     <div className="min-h-screen bg-background font-sans text-foreground selection:bg-brand/20 selection:text-brand flex flex-col">
       <Header />
 
-      {/* Page banner */}
-      <div className="border-b border-foreground/10 bg-card">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-start gap-4">
-            <div className="flex size-12 shrink-0 items-center justify-center bg-brand text-white">
-              <User size={24} weight="fill" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
-                My Profile
-              </h1>
-              <p className="mt-1 text-sm text-muted-foreground max-w-xl">
-                Manage your profile information, job preferences, CVs, and account security.
-                Keeping your profile up to date improves your visibility to employers.
-              </p>
-              <p className="mt-2 text-xs font-semibold text-muted-foreground">
-                Signed in as <span className="text-brand">{userEmail}</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <main className="flex-1 bg-secondary/35 py-10">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-8">
 
@@ -533,110 +552,162 @@ export default function ProfilePage({ userEmail }: ProfilePageProps) {
                   <CircleNotch size={24} className="animate-spin text-brand" />
                 </div>
               ) : (
-                <form onSubmit={handleSavePi} className="space-y-5">
-                  {piSuccess && <SuccessBanner message={piSuccess} />}
-                  {piError && <ErrorBanner message={piError} />}
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <FormField
-                      id="fullName"
-                      label="Full Name"
-                      required
-                      error={piErrors.fullName}
-                    >
-                      <Input
-                        id="fullName"
-                        type="text"
-                        placeholder="Jane Smith"
-                        value={pi.fullName}
-                        onChange={(e) => setPi((p) => ({ ...p, fullName: e.target.value }))}
-                        disabled={piSaving}
-                        className={`h-10 text-sm ${piErrors.fullName ? "border-destructive" : "border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"}`}
-                      />
-                    </FormField>
-
-                    <FormField
-                      id="phoneNumber"
-                      label="Phone Number"
-                      required
-                      error={piErrors.phoneNumber}
-                    >
-                      <Input
-                        id="phoneNumber"
-                        type="tel"
-                        placeholder="+84 012 345 6789"
-                        value={pi.phoneNumber}
-                        onChange={(e) => setPi((p) => ({ ...p, phoneNumber: e.target.value }))}
-                        disabled={piSaving}
-                        className={`h-10 text-sm ${piErrors.phoneNumber ? "border-destructive" : "border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"}`}
-                      />
-                    </FormField>
-
-                    <FormField id="dateOfBirth" label="Date of Birth" optional>
-                      <Input
-                        id="dateOfBirth"
-                        type="date"
-                        value={pi.dateOfBirth}
-                        onChange={(e) => setPi((p) => ({ ...p, dateOfBirth: e.target.value }))}
-                        disabled={piSaving}
-                        className="h-10 text-sm border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"
-                      />
-                    </FormField>
-
-                    <FormField id="city" label="Location / City" optional>
-                      <Input
-                        id="city"
-                        type="text"
-                        placeholder="Ho Chi Minh City"
-                        value={pi.city}
-                        onChange={(e) => setPi((p) => ({ ...p, city: e.target.value }))}
-                        disabled={piSaving}
-                        className="h-10 text-sm border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"
-                      />
-                    </FormField>
-                  </div>
-
-                  <FormField id="headline" label="Headline" optional>
-                    <Input
-                      id="headline"
-                      type="text"
-                      placeholder="e.g. Final-year Computer Science student | Seeking Software Engineering internships"
-                      value={pi.headline}
-                      onChange={(e) => setPi((p) => ({ ...p, headline: e.target.value }))}
-                      disabled={piSaving}
-                      className="h-10 text-sm border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"
-                    />
-                  </FormField>
-
-                  <FormField id="summary" label="Professional Summary" optional>
-                    <textarea
-                      id="summary"
-                      rows={4}
-                      placeholder="Write a brief summary of your skills, experience, and career goals…"
-                      value={pi.summary}
-                      onChange={(e) => setPi((p) => ({ ...p, summary: e.target.value }))}
-                      disabled={piSaving}
-                      className="w-full resize-y border border-foreground/15 bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus-visible:border-brand/50 focus-visible:ring-1 focus-visible:ring-brand/20 disabled:opacity-50 transition-colors"
-                    />
-                  </FormField>
-
-                  <div className="flex justify-end pt-2">
-                    <Button
-                      type="submit"
-                      disabled={piSaving}
-                      className="h-10 px-6 text-xs font-bold uppercase tracking-wider bg-brand hover:bg-brand/90 text-white border-none cursor-pointer transition-colors"
-                    >
-                      {piSaving ? (
-                        <span className="flex items-center gap-1.5">
-                          <CircleNotch className="animate-spin" size={13} />
-                          Saving…
-                        </span>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {/* Left Column: Avatar Uploader */}
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="relative group size-48 bg-brand/5 border border-foreground/20 flex items-center justify-center overflow-hidden">
+                      {avatarUrl ? (
+                        <img
+                          src={`http://localhost:3000${avatarUrl}`}
+                          alt="Avatar"
+                          className="size-full object-cover"
+                        />
                       ) : (
-                        "Save Changes"
+                        <User size={36} className="text-muted-foreground/60" weight="fill" />
                       )}
-                    </Button>
+
+                      {/* Uploading Spinner */}
+                      {avatarUploading && (
+                        <div className="absolute inset-0 bg-white/85 flex items-center justify-center">
+                          <CircleNotch size={20} className="animate-spin text-brand" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5 text-center items-center">
+                      <Button
+                        type="button"
+                        onClick={() => avatarInputRef.current?.click()}
+                        disabled={avatarUploading}
+                        className="h-8 px-4 text-[10px] font-bold uppercase tracking-wider bg-brand hover:bg-brand/90 text-white border-none cursor-pointer transition-colors"
+                      >
+                        {avatarUploading ? "Uploading..." : "Upload Photo"}
+                      </Button>
+                      <p className="text-[10px] text-muted-foreground leading-normal max-w-[150px]">
+                        JPG, JPEG or PNG. Max 3 MB.
+                      </p>
+                      {avatarError && (
+                        <p className="text-[10px] font-semibold text-destructive leading-normal max-w-[150px]">
+                          {avatarError}
+                        </p>
+                      )}
+                    </div>
+
+                    <input
+                      type="file"
+                      ref={avatarInputRef}
+                      className="hidden"
+                      accept="image/png, image/jpeg, image/jpg"
+                      onChange={handleAvatarChange}
+                    />
                   </div>
-                </form>
+
+                  {/* Right Column: Profile Form Fields */}
+                  <form onSubmit={handleSavePi} className="md:col-span-3 space-y-5">
+                    {piSuccess && <SuccessBanner message={piSuccess} />}
+                    {piError && <ErrorBanner message={piError} />}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <FormField
+                        id="fullName"
+                        label="Full Name"
+                        required
+                        error={piErrors.fullName}
+                      >
+                        <Input
+                          id="fullName"
+                          type="text"
+                          placeholder="Jane Smith"
+                          value={pi.fullName}
+                          onChange={(e) => setPi((p) => ({ ...p, fullName: e.target.value }))}
+                          disabled={piSaving}
+                          className={`h-10 text-sm ${piErrors.fullName ? "border-destructive" : "border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"}`}
+                        />
+                      </FormField>
+
+                      <FormField
+                        id="phoneNumber"
+                        label="Phone Number"
+                        required
+                        error={piErrors.phoneNumber}
+                      >
+                        <Input
+                          id="phoneNumber"
+                          type="tel"
+                          placeholder="+84 012 345 6789"
+                          value={pi.phoneNumber}
+                          onChange={(e) => setPi((p) => ({ ...p, phoneNumber: e.target.value }))}
+                          disabled={piSaving}
+                          className={`h-10 text-sm ${piErrors.phoneNumber ? "border-destructive" : "border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"}`}
+                        />
+                      </FormField>
+
+                      <FormField id="dateOfBirth" label="Date of Birth" optional>
+                        <Input
+                          id="dateOfBirth"
+                          type="date"
+                          value={pi.dateOfBirth}
+                          onChange={(e) => setPi((p) => ({ ...p, dateOfBirth: e.target.value }))}
+                          disabled={piSaving}
+                          className="h-10 text-sm border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"
+                        />
+                      </FormField>
+
+                      <FormField id="city" label="Location / City" optional>
+                        <Input
+                          id="city"
+                          type="text"
+                          placeholder="Ho Chi Minh City"
+                          value={pi.city}
+                          onChange={(e) => setPi((p) => ({ ...p, city: e.target.value }))}
+                          disabled={piSaving}
+                          className="h-10 text-sm border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"
+                        />
+                      </FormField>
+                    </div>
+
+                    <FormField id="headline" label="Headline" optional>
+                      <Input
+                        id="headline"
+                        type="text"
+                        placeholder="e.g. Final-year Computer Science student | Seeking Software Engineering internships"
+                        value={pi.headline}
+                        onChange={(e) => setPi((p) => ({ ...p, headline: e.target.value }))}
+                        disabled={piSaving}
+                        className="h-10 text-sm border-foreground/15 focus-visible:border-brand/50 focus-visible:ring-brand/20"
+                      />
+                    </FormField>
+
+                    <FormField id="summary" label="Professional Summary" optional>
+                      <textarea
+                        id="summary"
+                        rows={4}
+                        placeholder="Write a brief summary of your skills, experience, and career goals…"
+                        value={pi.summary}
+                        onChange={(e) => setPi((p) => ({ ...p, summary: e.target.value }))}
+                        disabled={piSaving}
+                        className="w-full resize-y border border-foreground/15 bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus-visible:border-brand/50 focus-visible:ring-1 focus-visible:ring-brand/20 disabled:opacity-50 transition-colors"
+                      />
+                    </FormField>
+
+                    <div className="flex justify-end pt-2">
+                      <Button
+                        type="submit"
+                        disabled={piSaving}
+                        className="h-10 px-6 text-xs font-bold uppercase tracking-wider bg-brand hover:bg-brand/90 text-white border-none cursor-pointer transition-colors"
+                      >
+                        {piSaving ? (
+                          <span className="flex items-center gap-1.5">
+                            <CircleNotch className="animate-spin" size={13} />
+                            Saving…
+                          </span>
+                        ) : (
+                          "Save Changes"
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -666,7 +737,7 @@ export default function ProfilePage({ userEmail }: ProfilePageProps) {
                     <p className="text-[11px] font-medium text-foreground">
                       Control whether employers can find your profile in search results.
                     </p>
-                    <ToggleGroup
+                    <ToggleGroup 
                       options={[
                         { label: "Visible to Employers", value: "VISIBLE_TO_EMPLOYERS" },
                         { label: "Private", value: "PRIVATE" },

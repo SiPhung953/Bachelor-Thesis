@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthenticateUserData, AuthenticateUserResponses, ChangePasswordData, ChangePasswordResponses, DeleteResumeData, DeleteResumeResponses, GetCompanyProfileData, GetCompanyProfileResponses, GetJobPreferenceData, GetJobPreferenceResponses, GetMyProfileData, GetMyProfileResponses, GetMyResumesData, GetMyResumesResponses, LogoutUserData, LogoutUserResponses, RegisterUserData, RegisterUserResponses, RequestPasswordResetData, RequestPasswordResetResponses, ResetPasswordData, ResetPasswordResponses, SearchJobsData, SearchJobsResponses, UpdateJobPreferenceData, UpdateJobPreferenceResponses, UpdatePersonalInformationData, UpdatePersonalInformationResponses, UploadResumeData, UploadResumeResponses, ValidateResetTokenData, ValidateResetTokenResponses } from './types.gen';
+import type { AuthenticateUserData, AuthenticateUserResponses, ChangeAvatarData, ChangeAvatarResponses, ChangePasswordData, ChangePasswordResponses, DeleteResumeData, DeleteResumeResponses, GetCompanyProfileData, GetCompanyProfileResponses, GetJobPreferenceData, GetJobPreferenceResponses, GetMyProfileData, GetMyProfileResponses, GetMyResumesData, GetMyResumesResponses, LogoutUserData, LogoutUserResponses, RegisterUserData, RegisterUserResponses, RequestPasswordResetData, RequestPasswordResetResponses, ResetPasswordData, ResetPasswordResponses, SearchJobsData, SearchJobsResponses, UpdateJobPreferenceData, UpdateJobPreferenceResponses, UpdatePersonalInformationData, UpdatePersonalInformationResponses, UploadResumeData, UploadResumeResponses, ValidateResetTokenData, ValidateResetTokenResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -76,6 +76,18 @@ export const updateJobPreference = <ThrowOnError extends boolean = false>(option
     ...options,
     headers: {
         'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const changeAvatar = <ThrowOnError extends boolean = false>(options: Options<ChangeAvatarData, ThrowOnError>) => (options.client ?? client).patch<ChangeAvatarResponses, unknown, ThrowOnError>({
+    ...formDataBodySerializer,
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me/avatar',
+    ...options,
+    headers: {
+        'Content-Type': null,
         ...options.headers
     }
 });

@@ -70,6 +70,11 @@ export type UpdateJobPreferencesRequest = {
     preferredLocation?: string;
 };
 
+export type ChangeAvatarResponse = {
+    message: string;
+    avatarUrl: string;
+};
+
 export type ChangePasswordResponse = {
     message: string;
 };
@@ -186,8 +191,8 @@ export type GetMyResumesResponse = GetMyResumesResponses[keyof GetMyResumesRespo
 
 export type UploadResumeData = {
     body: {
-        title: string;
-        file: Blob | File;
+        resumeTitle: string;
+        resumeFile: Blob | File;
     };
     path?: never;
     query?: never;
@@ -237,6 +242,7 @@ export type GetMyProfileResponses = {
     200: {
         profile: {
             updatedAt: string;
+            avatarUrl: string;
             city: string;
             phoneNumber: string;
             summary: string;
@@ -303,6 +309,24 @@ export type UpdateJobPreferenceResponses = {
 };
 
 export type UpdateJobPreferenceResponse = UpdateJobPreferenceResponses[keyof UpdateJobPreferenceResponses];
+
+export type ChangeAvatarData = {
+    body: {
+        file: Blob | File;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/me/avatar';
+};
+
+export type ChangeAvatarResponses = {
+    /**
+     * OK
+     */
+    200: ChangeAvatarResponse;
+};
+
+export type ChangeAvatarResponse2 = ChangeAvatarResponses[keyof ChangeAvatarResponses];
 
 export type ChangePasswordData = {
     body: ChangePasswordRequest;
