@@ -20,7 +20,7 @@ export class FileStorageService {
         await fs.writeFile(storedFilePath, file.buffer);
 
         // Return the file path as a URL
-        return `/upload/resumes/${storedFileName}`;
+        return `/uploads/resumes/${storedFileName}`;
     }
 
     /**
@@ -40,7 +40,7 @@ export class FileStorageService {
         await fs.writeFile(storedFilePath, avatar.buffer);
         
         // Return the file path as a URL
-        return `/upload/avatars/${storedFileName}`;
+        return `/uploads/avatars/${storedFileName}`;
     }
 
     /**

@@ -3,6 +3,7 @@ import "dotenv/config";
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 import cors from "cors"
+import path from 'path';
 
 import { RegisterRoutes } from "./generated/routes.js";
 import swaggerDocument from "./generated/swagger.json"
@@ -20,6 +21,11 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use(
+  "/uploads",
+  express.static(path.resolve("uploads"))
+);
 
 RegisterRoutes(app);
 
