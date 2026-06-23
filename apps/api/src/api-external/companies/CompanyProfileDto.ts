@@ -3,4 +3,5 @@ export interface CompanyProfileDto {
     name: string;
     city: string;
     district?: string | null;
+    description: string;
 }

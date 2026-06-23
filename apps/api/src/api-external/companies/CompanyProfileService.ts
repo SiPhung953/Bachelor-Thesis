@@ -23,7 +23,8 @@ export class CompanyProfileService {
             id: company.id,
             name: company.name,
             city: company.city,
-            district: company.district
+            district: company.district,
+            description: company.description
         };
 
         // 4. then return Job Posting associated with the company
