@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/ui-shared/components/ui/button";
+import { Input } from "@/ui-shared/components/ui/input";
+import { Label } from "@/ui-shared/components/ui/label";
 import {
   Card,
   CardHeader,
@@ -10,7 +10,7 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "@/components/ui/card";
+} from "@/ui-shared/components/ui/card";
 import { ArrowLeft, Eye, EyeSlash, CircleNotchIcon, GraduationCapIcon } from "@phosphor-icons/react";
 import { resetPassword, validateResetToken } from "@/client/sdk.gen";
 

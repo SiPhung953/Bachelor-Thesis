@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/ui-shared/components/ui/button"
+import { Input } from "@/ui-shared/components/ui/input"
 import { MagnifyingGlass, MapPin, Sparkle } from "@phosphor-icons/react"
 
 interface HeroProps {

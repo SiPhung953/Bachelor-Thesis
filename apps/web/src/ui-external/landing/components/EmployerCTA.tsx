@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/ui-shared/components/ui/button"
 import { CheckCircle, Megaphone, ArrowUpRight } from "@phosphor-icons/react"
 
 export default function EmployerCTA() {

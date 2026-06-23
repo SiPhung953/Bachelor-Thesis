@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react"
 import { Link } from "react-router-dom"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/ui-shared/components/ui/card"
+import { Badge } from "@/ui-shared/components/ui/badge"
+import { Button } from "@/ui-shared/components/ui/button"
 import { MapPin, CurrencyDollar, CalendarBlank, ArrowRight, Briefcase } from "@phosphor-icons/react"
 
 interface Job {

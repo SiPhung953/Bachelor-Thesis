@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/ui-shared/components/ui/button"
+import { Input } from "@/ui-shared/components/ui/input"
 import { GraduationCap, GithubLogo, LinkedinLogo, TwitterLogo, PaperPlaneRight } from "@phosphor-icons/react"
 import React, { useState } from "react"
 

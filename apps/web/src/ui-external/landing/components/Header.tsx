@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/ui-shared/components/ui/button"
 import { GraduationCap, List, X } from "@phosphor-icons/react"
 
 export default function Header() {

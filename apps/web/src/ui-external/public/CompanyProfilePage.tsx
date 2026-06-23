@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/ui-shared/components/ui/button";
+import { Badge } from "@/ui-shared/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@/ui-shared/components/ui/card";
 import Header from "@/ui-external/landing/components/Header";
 import Footer from "@/ui-external/landing/components/Footer";
 import {
