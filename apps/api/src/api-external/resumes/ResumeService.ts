@@ -1,9 +1,7 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { randomUUID } from 'crypto';
-
 import { prisma } from '../../lib/prisma';
 import { HttpError } from '../../utils/HttpError';
+import { FileStorageService } from '../../utils/FileStorageService';
+
 import { UploadResumeResponse } from './UploadResumeResponse';
 import { GetMyResumeResponse } from './GetMyResumesResponse';
 
@@ -22,6 +20,8 @@ function isAllowedMimeType(mimeType: string): mimeType is MimeFileType {
 }
 
 export class ResumeService {
+    private readonly fileStorageService = new FileStorageService();
+
     public async getMyResumes(userId: string): Promise<GetMyResumeResponse> {
         const resumes = await prisma.resume.findMany({
             // Find and return resumes list
@@ -74,19 +74,8 @@ export class ResumeService {
         // 2. Configuration for local file storing
         const fileType = MIME_TO_FILE_TYPE[file.mimetype];
 
-        // Create a directory for storing resumes if it doesn't exist
-        const uploadDir = path.resolve("uploads/resumes");
-        await fs.mkdir(uploadDir, { recursive: true });
-
-        // Generate unique file name and store its path
-        const storedFileName = `${randomUUID()}-${file.originalname}`;
-        const storedFilePath = path.join(uploadDir, storedFileName);
-
-        // Write the file to the file system
-        await fs.writeFile(storedFilePath, file.buffer);
-
-        // Store the file path as a URL
-        const fileUrl = `/upload/resumes/${storedFileName}`;
+        // Save the file using FileStorageService
+        const fileUrl = await this.fileStorageService.saveCv(file);
         
         // Create resume in the database
         const resume = await prisma.resume.create({
@@ -120,6 +109,7 @@ export class ResumeService {
                 id: true,
                 userId: true,
                 deletedAt: true,
+                fileUrl: true,
                 applications: {
                     select: {
                         id: true,
@@ -157,6 +147,9 @@ export class ResumeService {
         await prisma.resume.delete({
             where: { id: resumeId },
         });
+
+        // Delete the file from local storage
+        await this.fileStorageService.deleteFile(resume.fileUrl);
 
         return {
                 message: "CV deleted successfully"
