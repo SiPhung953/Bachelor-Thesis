@@ -74,5 +74,5 @@ export class AuthController extends Controller {
         @Query() token: string
     ): Promise<{ valid: boolean }> {
         return this.authService.validateResetToken(token);
-}
+    }
 }

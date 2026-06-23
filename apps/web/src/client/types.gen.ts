@@ -4,6 +4,81 @@ export type ClientOptions = {
     baseURL: `${string}://${string}` | (string & {});
 };
 
+export type ResumeDto = {
+    id: string;
+    title: string;
+    fileUrl: string;
+    fileType: 'PDF' | 'DOC' | 'DOCX';
+    fileSize: number;
+    uploadedAt: string;
+};
+
+export type GetMyResumeResponse = {
+    resumes: Array<ResumeDto>;
+};
+
+export type UploadResumeResponse = {
+    message: string;
+    resume: ResumeDto;
+};
+
+export type PersonalInformationDto = {
+    fullName: string | null;
+    dateOfBirth: string | null;
+    headline: string | null;
+    phoneNumber: string | null;
+    city: string | null;
+    summary: string | null;
+    updatedAt: string;
+};
+
+export type UpdatePersonalInformationResponse = {
+    message: string;
+    userProfile: PersonalInformationDto;
+};
+
+export type UpdatePersonalInformationRequest = {
+    fullName?: string;
+    dateOfBirth?: string | null;
+    headline?: string;
+    phoneNumber?: string;
+    city?: string;
+    summary?: string;
+};
+
+export type ProfileVisibility = 'PRIVATE' | 'VISIBLE_TO_EMPLOYERS';
+
+export type JobSearchStatus = 'OPEN_TO_WORK' | 'NOT_LOOKING';
+
+export type JobPreferencesDto = {
+    profileVisibility: 'VISIBLE_TO_EMPLOYERS' | 'PRIVATE';
+    jobSearchStatus: 'OPEN_TO_WORK' | 'NOT_LOOKING';
+    desiredJobTitle: string | null;
+    preferredLocation: string | null;
+    updatedAt: string;
+};
+
+export type UpdateJobPreferencesResponse = {
+    message: string;
+    userJobPreference: JobPreferencesDto;
+};
+
+export type UpdateJobPreferencesRequest = {
+    profileVisibility?: 'VISIBLE_TO_EMPLOYERS' | 'PRIVATE';
+    jobSearchStatus?: 'OPEN_TO_WORK' | 'NOT_LOOKING';
+    desiredJobTitle?: string;
+    preferredLocation?: string;
+};
+
+export type ChangePasswordResponse = {
+    message: string;
+};
+
+export type ChangePasswordRequest = {
+    currentPassword: string;
+    newPassword: string;
+};
+
 export type JobListItemDto = {
     id: string;
     title: string;
@@ -26,6 +101,7 @@ export type CompanyProfileDto = {
     name: string;
     city: string;
     district?: string | null;
+    description: string;
 };
 
 export type EmploymentType = 'ON_SITE' | 'REMOTE' | 'HYBRID';
@@ -59,7 +135,7 @@ export type LoginRequest = {
 
 export type RegisterResponse = {
     user: {
-        status: string;
+        status: 'ACTIVE' | 'BANNED';
         roleId: number;
         email: string;
         id: string;
@@ -91,6 +167,158 @@ export type ResetPasswordRequest = {
     token: string;
     newPassword: string;
 };
+
+export type GetMyResumesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/me/resumes';
+};
+
+export type GetMyResumesResponses = {
+    /**
+     * Ok
+     */
+    200: GetMyResumeResponse;
+};
+
+export type GetMyResumesResponse = GetMyResumesResponses[keyof GetMyResumesResponses];
+
+export type UploadResumeData = {
+    body: {
+        title: string;
+        file: Blob | File;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/me/resumes';
+};
+
+export type UploadResumeResponses = {
+    /**
+     * Created
+     */
+    201: UploadResumeResponse;
+};
+
+export type UploadResumeResponse2 = UploadResumeResponses[keyof UploadResumeResponses];
+
+export type DeleteResumeData = {
+    body?: never;
+    path: {
+        resumeId: string;
+    };
+    query?: never;
+    url: '/users/me/resumes/{resumeId}';
+};
+
+export type DeleteResumeResponses = {
+    /**
+     * OK
+     */
+    200: {
+        message: string;
+    };
+};
+
+export type DeleteResumeResponse = DeleteResumeResponses[keyof DeleteResumeResponses];
+
+export type GetMyProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/me/profile';
+};
+
+export type GetMyProfileResponses = {
+    /**
+     * OK
+     */
+    200: {
+        profile: {
+            updatedAt: string;
+            city: string;
+            phoneNumber: string;
+            summary: string;
+            headline: string;
+            dateOfBirth: string;
+            fullName: string;
+        };
+    };
+};
+
+export type GetMyProfileResponse = GetMyProfileResponses[keyof GetMyProfileResponses];
+
+export type UpdatePersonalInformationData = {
+    body: UpdatePersonalInformationRequest;
+    path?: never;
+    query?: never;
+    url: '/users/me/profile';
+};
+
+export type UpdatePersonalInformationResponses = {
+    /**
+     * OK
+     */
+    200: UpdatePersonalInformationResponse;
+};
+
+export type UpdatePersonalInformationResponse2 = UpdatePersonalInformationResponses[keyof UpdatePersonalInformationResponses];
+
+export type GetJobPreferenceData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/me/job-preference';
+};
+
+export type GetJobPreferenceResponses = {
+    /**
+     * OK
+     */
+    200: {
+        preference: {
+            preferredLocation: string;
+            desiredJobTitle: string;
+            jobSearchStatus: JobSearchStatus;
+            profileVisibility: ProfileVisibility;
+        };
+    };
+};
+
+export type GetJobPreferenceResponse = GetJobPreferenceResponses[keyof GetJobPreferenceResponses];
+
+export type UpdateJobPreferenceData = {
+    body: UpdateJobPreferencesRequest;
+    path?: never;
+    query?: never;
+    url: '/users/me/job-preference';
+};
+
+export type UpdateJobPreferenceResponses = {
+    /**
+     * OK
+     */
+    200: UpdateJobPreferencesResponse;
+};
+
+export type UpdateJobPreferenceResponse = UpdateJobPreferenceResponses[keyof UpdateJobPreferenceResponses];
+
+export type ChangePasswordData = {
+    body: ChangePasswordRequest;
+    path?: never;
+    query?: never;
+    url: '/users/me/change-password';
+};
+
+export type ChangePasswordResponses = {
+    /**
+     * OK
+     */
+    200: ChangePasswordResponse;
+};
+
+export type ChangePasswordResponse2 = ChangePasswordResponses[keyof ChangePasswordResponses];
 
 export type SearchJobsData = {
     body?: never;

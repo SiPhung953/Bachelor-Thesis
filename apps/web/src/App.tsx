@@ -8,6 +8,7 @@ import DashboardPage from "@/ui-internal/dashboard/DashboardPage"
 import ResetPasswordPage from "./ui-external/auth/ResetPassword"
 import JobDetailPage from "@/ui-external/public/JobDetailPage"
 import CompanyProfilePage from "@/ui-external/public/CompanyProfilePage"
+import ProfilePage from "@/ui-external/profile/ProfilePage"
 
 function AppContent() {
   const navigate = useNavigate()
@@ -77,6 +78,18 @@ function AppContent() {
         element={
           isLoggedIn ? (
             <DashboardPage userEmail={userEmail} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
+      {/* Protected Profile Route */}
+      <Route
+        path="/profile"
+        element={
+          isLoggedIn ? (
+            <ProfilePage userEmail={userEmail} onLogout={handleLogout} />
           ) : (
             <Navigate to="/login" replace />
           )
