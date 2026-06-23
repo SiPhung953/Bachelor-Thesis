@@ -16,6 +16,8 @@ import { ProfileService } from './ProfileService';
 import { CurrentUser } from "../../security/CurrentAuthenticatedUser";
 import { UpdateJobPreferencesRequest } from './UpdateJobPreferenceRequest';
 import { UpdatePersonalInformationRequest } from './UpdatePersonalInformationRequest';
+import { ChangePasswordRequest } from "./ChangePasswordRequest";
+import { ChangePasswordResponse } from "./ChangePasswordResponse";
 
 // Helper interface to extend tsoa's Request object
 // Tsoa will automatically infer this when security is applied
@@ -68,5 +70,15 @@ export class ProfileController extends Controller {
   ) {
     const userId = request.currentUser!.id;
     return this.profileService.updateJobPreference(userId, requestBody);
+  }
+
+  @SuccessResponse("200", "OK")
+  @Patch("change-password")
+  public async changePassword(
+    @Request() request: AuthenticatedRequest,
+    @Body() requestBody: ChangePasswordRequest
+  ): Promise<ChangePasswordResponse> {
+    const userId = request.currentUser!.id;
+    return this.profileService.changePassword(userId, requestBody);
   }
 }

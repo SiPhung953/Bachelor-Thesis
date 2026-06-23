@@ -1,8 +1,16 @@
+
 import { prisma } from '../../lib/prisma';
+import { PasswordHasher } from '../../utils/PasswordHasher';
+import { HttpError } from '../../utils/HttpError';
+
 import { UpdateJobPreferencesRequest } from './UpdateJobPreferenceRequest';
 import { UpdatePersonalInformationRequest } from './UpdatePersonalInformationRequest';
 import { UpdatePersonalInformationResponse } from './UpdatePersonalInformationResponse';
 import { UpdateJobPreferencesResponse } from './UpdateJobPreferenceResponse';
+import { ChangePasswordResponse } from './ChangePasswordResponse';
+import { ChangePasswordRequest } from './ChangePasswordRequest';
+
+const passwordHasher = new PasswordHasher();
 
 export class ProfileService {
     public async getMyProfile(userId: string) {
@@ -144,5 +152,46 @@ export class ProfileService {
             message: "Job Preference Updated Successfully",
             userJobPreference: jobPreferences
         }
+    }
+
+    // I forgot to implement this LMAOOOOOOOO
+    public async changePassword(
+        userId: string,
+        requestBody: ChangePasswordRequest
+    ): Promise<ChangePasswordResponse> {
+        // 1. Find user to get their current passwordHash
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                passwordHash: true,
+            }
+        });
+        // 2. Check if the user is null (not found)
+        if (!user) {
+            throw new HttpError(404, "User not found")
+        }
+        // 3. Compare current password with stored passwordHash
+        const isCurrentPasswordMatch = await passwordHasher.compare(
+            requestBody.currentPassword,
+            user.passwordHash
+        );
+        // 4. If current password doesn't match, reject password change
+        if (!isCurrentPasswordMatch) {
+            throw new HttpError(400, "Invalid current password");
+        }
+        // 5. Else, hash new password
+        const newPasswordHash = await passwordHasher.hash(
+            requestBody.newPassword
+        );
+        // 6. Update Prisma with new passwordHash
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                passwordHash: newPasswordHash,
+            },
+        });
+        return {
+            message: "Password changed successfully",
+        };
     }
 }
