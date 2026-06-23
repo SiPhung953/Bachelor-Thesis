@@ -50,40 +50,40 @@ export class ResumeService {
 
     public async uploadResume(
         userId: string,
-        title: string,
-        file: Express.Multer.File
+        resumeTitle: string,
+        resumeFile: Express.Multer.File
     ): Promise<UploadResumeResponse> {
         // 1. Check whether the user: 
         // Named their CV
-        if (!title || title.trim().length === 0) {
+        if (!resumeTitle || resumeTitle.trim().length === 0) {
             throw new HttpError(400, "CV title is required");
         }
         // Uploaded their CV
-        if (!file) {
+        if (!resumeFile) {
             throw new HttpError(400, "CV file is required");
         }
         // Uploaded file within the size limit
-        if (file.size > MAX_FILE_SIZE) {
+        if (resumeFile.size > MAX_FILE_SIZE) {
             throw new HttpError(400, "CV file must not exceed 5MB");
         }
         // Uploaded correct CV file type
-        if (!isAllowedMimeType(file.mimetype)) {
+        if (!isAllowedMimeType(resumeFile.mimetype)) {
             throw new HttpError(400, "Only PDF, DOC and DOCX files are supported");
         }
 
         // 2. Configuration for local file storing
-        const fileType = MIME_TO_FILE_TYPE[file.mimetype];
+        const fileType = MIME_TO_FILE_TYPE[resumeFile.mimetype];
 
         // Save the file using FileStorageService
-        const fileUrl = await this.fileStorageService.saveCv(file);
+        const fileUrl = await this.fileStorageService.saveCv(resumeFile);
         
         // Create resume in the database
         const resume = await prisma.resume.create({
             data: {
                 userId,
-                title: title.trim(),
+                title: resumeTitle.trim(),
                 fileUrl,
-                fileSize: file.size,
+                fileSize: resumeFile.size,
                 fileType,
             },
             select: {

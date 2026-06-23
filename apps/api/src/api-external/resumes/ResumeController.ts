@@ -41,8 +41,8 @@ export class ResumeController extends Controller {
     @Post()
     public async uploadResume(
         @Request() request: AuthenticatedRequest,
-        @FormField() title: string,
-        @UploadedFile() file: Express.Multer.File
+        @FormField() resumeTitle: string,
+        @UploadedFile() resumeFile: Express.Multer.File
     ): Promise<UploadResumeResponse> {
         const userId = request.currentUser.id;
         // Some note here if I'm stupid (I am)
@@ -54,7 +54,7 @@ export class ResumeController extends Controller {
         // The Service layer should only be responsible for business logic (Validation, database operations, etc.)
         // While the Controller layer is responsible for HTTP request and response (which include Status codes and route handling)
         this.setStatus(201);
-        return this.resumeService.uploadResume(userId, title, file);
+        return this.resumeService.uploadResume(userId, resumeTitle, resumeFile);
     }
 
     @SuccessResponse("200", "OK")
