@@ -7,7 +7,8 @@ import {
   SuccessResponse,
   Tags,
   Security,
-  Request // This Request is a decorator, different from ExpressRequest
+  Request, // This Request is a decorator, different from ExpressRequest
+  UploadedFile,
 } from "tsoa";
 import { Request as ExpressRequest } from 'express';
 
@@ -34,7 +35,7 @@ interface AuthenticatedRequest extends ExpressRequest {
 export class ProfileController extends Controller {
   private readonly profileService = new ProfileService()
 
-  @SuccessResponse("200","OK")
+  @SuccessResponse("200", "OK")
   @Get("profile")
   public async getMyProfile(
     @Request() request: AuthenticatedRequest
@@ -42,7 +43,7 @@ export class ProfileController extends Controller {
     const userId = request.currentUser!.id;
     return this.profileService.getMyProfile(userId);
   }
-  
+
   @SuccessResponse("200", "OK") // Maybe 201 Created?
   @Patch("profile")
   public async updatePersonalInformation(
@@ -70,6 +71,16 @@ export class ProfileController extends Controller {
   ) {
     const userId = request.currentUser!.id;
     return this.profileService.updateJobPreference(userId, requestBody);
+  }
+
+  @SuccessResponse("200", "OK")
+  @Patch("avatar")
+  public async changeAvatar(
+    @Request() request: AuthenticatedRequest,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const userId = request.currentUser!.id;
+    return this.profileService.changeAvatar(userId, file);
   }
 
   @SuccessResponse("200", "OK")

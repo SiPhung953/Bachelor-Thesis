@@ -24,6 +24,26 @@ export class FileStorageService {
     }
 
     /**
+     * Saves an avatar file to the uploads/avatars directory.
+     * @param avatar The uploaded avatar file.
+     * @returns The relative URL of the saved file.
+     */
+    public async saveAvatar(avatar: Express.Multer.File): Promise<string> {
+        const uploadDir = path.resolve("uploads/avatars");
+        await fs.mkdir(uploadDir, { recursive: true });
+        
+        // Generate unique file name and store its path
+        const storedFileName = `${randomUUID()}-${avatar.originalname}`;
+        const storedFilePath = path.join(uploadDir, storedFileName);
+        
+        // Write the file to the file system
+        await fs.writeFile(storedFilePath, avatar.buffer);
+        
+        // Return the file path as a URL
+        return `/upload/avatars/${storedFileName}`;
+    }
+
+    /**
      * Deletes a file from the disk based on its file URL.
      * @param fileUrl The URL of the file to delete (e.g. /upload/resumes/filename).
      */

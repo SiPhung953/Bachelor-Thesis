@@ -9,10 +9,13 @@ import { UpdatePersonalInformationResponse } from './UpdatePersonalInformationRe
 import { UpdateJobPreferencesResponse } from './UpdateJobPreferenceResponse';
 import { ChangePasswordResponse } from './ChangePasswordResponse';
 import { ChangePasswordRequest } from './ChangePasswordRequest';
-
-const passwordHasher = new PasswordHasher();
+import { FileStorageService } from '../../utils/FileStorageService';
+import { ChangeAvatarResponse } from './ChangeAvatarResponse';
 
 export class ProfileService {
+    private readonly passwordHasher = new PasswordHasher();
+    private readonly fileStorageService = new FileStorageService();
+
     public async getMyProfile(userId: string) {
         const profile = await prisma.userProfile.findUnique({
             // 1. Find user by Id
@@ -157,8 +160,45 @@ export class ProfileService {
             userJobPreference: jobPreferences
         }
     }
+    
+    public async changeAvatar(
+        userId: string,
+        avatarFile: Express.Multer.File
+    ): Promise<ChangeAvatarResponse> {
+        // 1. Verify that file exist
+        if (!avatarFile) {
+            throw new HttpError(400, "Avatar file is required");
+        }
+        // 2. Validate image type
+        const allowedImageMimeTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+        ];
+        if (!allowedImageMimeTypes.includes(avatarFile.mimetype)) {
+            throw new HttpError(400, "Only JPG, JPEG and PNG images are allowed");
+        }
+        // 3. Validate image size
+        const MAX_IMAGE_SIZE = 3 * 1024 * 1024 // 3MB
+        if (avatarFile.size > MAX_IMAGE_SIZE) {
+            throw new HttpError(400, "Image file must not exceed 3MB");
+        }
+        // 4. Save image
+        const avatarUrl = await this.fileStorageService.saveAvatar(avatarFile);
+        // 5. Update userProfile.avatarUrl
+        await prisma.userProfile.update({
+            where: { userId: userId },
+            data: {
+                avatarUrl
+            },
+        });
+        // 6. Return AvatarUrl
+        return {
+            message: "Avatar updated successfully",
+            avatarUrl: avatarUrl,
+        }
+    }
 
-    // I forgot to implement this LMAOOOOOOOO
     public async changePassword(
         userId: string,
         requestBody: ChangePasswordRequest
@@ -175,7 +215,7 @@ export class ProfileService {
             throw new HttpError(404, "User not found")
         }
         // 3. Compare current password with stored passwordHash
-        const isCurrentPasswordMatch = await passwordHasher.compare(
+        const isCurrentPasswordMatch = await this.passwordHasher.compare(
             requestBody.currentPassword,
             user.passwordHash
         );
@@ -184,7 +224,7 @@ export class ProfileService {
             throw new HttpError(400, "Invalid current password");
         }
         // 5. Else, hash new password
-        const newPasswordHash = await passwordHasher.hash(
+        const newPasswordHash = await this.passwordHasher.hash(
             requestBody.newPassword
         );
         // 6. Update Prisma with new passwordHash
