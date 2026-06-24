@@ -26,7 +26,6 @@ import {
   Trash,
   Warning,
   File,
-  Camera,
 } from "@phosphor-icons/react"
 import {
   getMyProfile,
@@ -503,6 +502,7 @@ export default function ProfilePage({ userEmail }: ProfilePageProps) {
     else if (sec.newPassword.length < 6) errs.newPassword = "Password must be at least 6 characters."
     if (!sec.confirmPassword) errs.confirmPassword = "Please confirm your new password."
     else if (sec.newPassword !== sec.confirmPassword) errs.confirmPassword = "Passwords do not match."
+    else if (sec.currentPassword === sec.newPassword) errs.newPassword = "New password must be different from current password."
     return errs
   }
 

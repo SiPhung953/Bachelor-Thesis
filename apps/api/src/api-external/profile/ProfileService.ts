@@ -224,11 +224,20 @@ export class ProfileService {
         if (!isCurrentPasswordMatch) {
             throw new HttpError(400, "Invalid current password");
         }
-        // 5. Else, hash new password
+        // 5. Compare new password with stored passwordHash
+        const isNewPasswordDifferent = await this.passwordHasher.compare(
+            requestBody.newPassword,
+            user.passwordHash
+        );
+        // 6. If new password is the same as old password, reject password change
+        if (!isNewPasswordDifferent) {
+            throw new HttpError(400, "New password cannot be the same as old password")
+        }
+        // 7. Else, hash new password
         const newPasswordHash = await this.passwordHasher.hash(
             requestBody.newPassword
         );
-        // 6. Update Prisma with new passwordHash
+        // 8. Update Prisma with new passwordHash
         await prisma.user.update({
             where: { id: userId },
             data: {
