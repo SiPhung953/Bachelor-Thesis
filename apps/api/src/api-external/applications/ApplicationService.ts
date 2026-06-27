@@ -7,6 +7,7 @@ import { CurrentUser } from '../../security/CurrentAuthenticatedUser';
 import { ApplyJobRequest } from './ApplyJobRequest';
 import { ApplyJobResponse } from './ApplyJobResponse';
 import { ApplicationListDto } from './ApplicationListDto';
+import { WithdrawApplicationResponse } from './WithdrawApplicationResponse';
 
 export class ApplicationService {
     public async applyJob(
@@ -132,5 +133,54 @@ export class ApplicationService {
             status: applications.status,
             appliedAt: applications.appliedAt,
         }));
+    }
+
+    public async withdrawApplication(
+        currentUser: CurrentUser,
+        applicationId: string
+    ): Promise<WithdrawApplicationResponse> {
+        if (currentUser.roleId !== RoleConstant.JOB_SEEKER) {
+            throw new HttpError(403, "Unauthorized");
+        }
+
+        const application = await prisma.application.findUnique({
+            where: { id: applicationId },
+            select: {
+                id: true,
+                userId: true,
+                status: true,
+            },
+        });
+        // existence check
+        if (!application) {
+            throw new HttpError(404, "Application not found");
+        }
+        // ownership check
+        if (application.userId !== currentUser.id) {
+            throw new HttpError(403, "You are not allowed to withdrawn this application");
+        }
+        // status check
+        // NOTE: UNDER_REVIEW cannot be withdrawn
+        if (application.status !== "SUBMITTED") {
+            throw new HttpError(400, "You cannot withdraw at current stage");
+        }
+
+        const updatedApplication = await prisma.application.update({
+            where: { id: applicationId },
+            data: {
+                status: "WITHDRAWN",
+                withdrawnAt: new Date(),
+            },
+            select: {
+                status: true,
+                withdrawnAt: true,
+            },
+        });
+
+        return {
+            status: updatedApplication.status,
+            withdrawnAt: updatedApplication.withdrawnAt || new Date(),
+            message: "Application withdrawn successfully"
+        }
     }
 }
