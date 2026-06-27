@@ -16,7 +16,7 @@ export class ApplicationService {
     ): Promise<ApplyJobResponse> {
         // 1. If the user is not a JOB_SEEKER or is banned, they can't apply
         if (currentUser?.roleId !== RoleConstant.JOB_SEEKER || currentUser.status === "BANNED") {
-            throw new HttpError(403, "You can't apply for jobs");
+            throw new HttpError(403, "Only Job Seekers can perform this action.");
         }
 
         // 2. Check whether Job exist and ACTIVE
@@ -32,10 +32,10 @@ export class ApplicationService {
         });
 
         if (!job) {
-            throw new HttpError(404, "Job not found");
+            throw new HttpError(404, "Job not found.");
         }
         if (job.status !== "ACTIVE") {
-            throw new HttpError(400, "This job posting is no longer available");
+            throw new HttpError(400, "Job posting is no longer available.");
         }
         // 3. Check whether Resume exist, and belong to current user
         const resume = await prisma.resume.findFirst({
@@ -46,10 +46,10 @@ export class ApplicationService {
         });
         
         if (!resume) {
-            throw new HttpError(404, "Resume not found");
+            throw new HttpError(404, "Resume not found.");
         }
         if (resume.userId !== currentUser.id) {
-            throw new HttpError(403, "You are not allowed to use this resume")
+            throw new HttpError(403, "You do not own this resume.")
         }
         // 4. Check whether Application have already been sent/applied
         const application = await prisma.application.findUnique({
@@ -62,7 +62,7 @@ export class ApplicationService {
         });
 
         if (application) {
-            throw new HttpError(409, "You have already applied to this job")
+            throw new HttpError(409, "You have already applied for this job.")
         }
         // 5. If nothing goes wrong, create an application row
         const createdApplication = await prisma.application.create({
@@ -88,7 +88,7 @@ export class ApplicationService {
 
     public async getMyApplications(currentUser: CurrentUser): Promise<ApplicationListDto[]> {
         if (currentUser.roleId !== RoleConstant.JOB_SEEKER) {
-            throw new HttpError(403, "Unauthorized");
+            throw new HttpError(403, "Only Job Seekers can perform this action.");
         }
 
         const applications = await prisma.application.findMany({
@@ -121,17 +121,17 @@ export class ApplicationService {
         // Since findMany return an array, we have to map the value
         // to their field in the Dto
         // Each applications entry will be mapped to an array object
-        return applications.map(applications => ({
-            applicationId: applications.id,
+        return applications.map(application => ({
+            applicationId: application.id,
 
-            jobId: applications.job.id,
-            jobTitle: applications.job.title,
+            jobId: application.job.id,
+            jobTitle: application.job.title,
 
-            companyId: applications.job.company.id,
-            companyName: applications.job.company.name,
+            companyId: application.job.company.id,
+            companyName: application.job.company.name,
 
-            status: applications.status,
-            appliedAt: applications.appliedAt,
+            status: application.status,
+            appliedAt: application.appliedAt,
         }));
     }
 
@@ -140,7 +140,7 @@ export class ApplicationService {
         applicationId: string
     ): Promise<WithdrawApplicationResponse> {
         if (currentUser.roleId !== RoleConstant.JOB_SEEKER) {
-            throw new HttpError(403, "Unauthorized");
+            throw new HttpError(403, "Only Job Seekers can perform this action.");
         }
 
         const application = await prisma.application.findUnique({
@@ -153,16 +153,16 @@ export class ApplicationService {
         });
         // existence check
         if (!application) {
-            throw new HttpError(404, "Application not found");
+            throw new HttpError(404, "Application not found.");
         }
         // ownership check
         if (application.userId !== currentUser.id) {
-            throw new HttpError(403, "You are not allowed to withdrawn this application");
+            throw new HttpError(403, "You are not allowed to withdraw this application.");
         }
         // status check
         // NOTE: UNDER_REVIEW cannot be withdrawn
         if (application.status !== "SUBMITTED") {
-            throw new HttpError(400, "You cannot withdraw at current stage");
+            throw new HttpError(400, "Application cannot be withdrawn at its current status.");
         }
 
         const updatedApplication = await prisma.application.update({
