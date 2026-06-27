@@ -15,7 +15,10 @@ export class ApplicationService {
         requestBody: ApplyJobRequest
     ): Promise<ApplyJobResponse> {
         // 1. If the user is not a JOB_SEEKER or is banned, they can't apply
-        if (currentUser?.roleId !== RoleConstant.JOB_SEEKER || currentUser.status === "BANNED") {
+        if (
+            currentUser?.roleId !== RoleConstant.JOB_SEEKER || 
+            currentUser.status === "BANNED"
+        ) {
             throw new HttpError(403, "Only Job Seekers can perform this action.");
         }
 
@@ -87,7 +90,10 @@ export class ApplicationService {
     }
 
     public async getMyApplications(currentUser: CurrentUser): Promise<ApplicationListDto[]> {
-        if (currentUser.roleId !== RoleConstant.JOB_SEEKER) {
+        if (
+            currentUser?.roleId !== RoleConstant.JOB_SEEKER || 
+            currentUser.status === "BANNED"
+        ) {
             throw new HttpError(403, "Only Job Seekers can perform this action.");
         }
 
@@ -139,7 +145,10 @@ export class ApplicationService {
         currentUser: CurrentUser,
         applicationId: string
     ): Promise<WithdrawApplicationResponse> {
-        if (currentUser.roleId !== RoleConstant.JOB_SEEKER) {
+        if (
+            currentUser?.roleId !== RoleConstant.JOB_SEEKER || 
+            currentUser.status === "BANNED"
+        ) {
             throw new HttpError(403, "Only Job Seekers can perform this action.");
         }
 
