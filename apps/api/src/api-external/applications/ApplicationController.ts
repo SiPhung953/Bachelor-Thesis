@@ -1,6 +1,7 @@
 import {
     Controller,
     Tags,
+    Get,
     Post,
     Body,
     Request,
@@ -12,6 +13,7 @@ import { Request as ExpressRequest } from 'express';
 
 import { ApplicationService } from './ApplicationService';
 import { CurrentUser } from '../../security/CurrentAuthenticatedUser';
+import { ApplicationListDto } from './ApplicationListDto';
 import { ApplyJobResponse } from './ApplyJobResponse';
 import { ApplyJobRequest } from './ApplyJobRequest';
 
@@ -33,5 +35,14 @@ export class ApplicationController extends Controller {
     ): Promise<ApplyJobResponse> {
         this.setStatus(201);
         return this.applicationService.applyJob(request.currentUser, requestBody)
+    }
+
+    @SuccessResponse(200, "OK")
+    @Get("my")
+    public async getMyApplications(
+        @Request() request: AuthenticatedRequest
+    ): Promise<ApplicationListDto[]> {
+        this.setStatus(200)
+        return this.applicationService.getMyApplications(request.currentUser)
     }
 }

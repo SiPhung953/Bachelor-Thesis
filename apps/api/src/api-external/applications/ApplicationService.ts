@@ -6,6 +6,7 @@ import { CurrentUser } from '../../security/CurrentAuthenticatedUser';
 
 import { ApplyJobRequest } from './ApplyJobRequest';
 import { ApplyJobResponse } from './ApplyJobResponse';
+import { ApplicationListDto } from './ApplicationListDto';
 
 export class ApplicationService {
     public async applyJob(
@@ -82,5 +83,54 @@ export class ApplicationService {
             status: createdApplication.status,
             appliedAt: createdApplication.appliedAt
         };
+    }
+
+    public async getMyApplications(currentUser: CurrentUser): Promise<ApplicationListDto[]> {
+        if (currentUser.roleId !== RoleConstant.JOB_SEEKER) {
+            throw new HttpError(403, "Unauthorized");
+        }
+
+        const applications = await prisma.application.findMany({
+            where: { userId: currentUser.id },
+            // You can query like this
+            select: {
+                id: true,
+                status: true,
+                appliedAt: true,
+
+                // Since application have a relation with job,
+                // and job have a relation with company
+                // you have this waterfall-ish query
+                job: {
+                    select: {
+                        id: true,
+                        title: true,
+                        
+                        company: {
+                            select: {
+                                id: true,
+                                name: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        // Since findMany return an array, we have to map the value
+        // to their field in the Dto
+        // Each applications entry will be mapped to an array object
+        return applications.map(applications => ({
+            applicationId: applications.id,
+
+            jobId: applications.job.id,
+            jobTitle: applications.job.title,
+
+            companyId: applications.job.company.id,
+            companyName: applications.job.company.name,
+
+            status: applications.status,
+            appliedAt: applications.appliedAt,
+        }));
     }
 }
