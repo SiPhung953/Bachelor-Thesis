@@ -101,6 +101,18 @@ export type SearchJobsQuery = {
     location?: string;
 };
 
+export type GetJobDetailResponse = {
+    id: string;
+    title: string;
+    description: string;
+    location: string;
+    employmentType: 'ON_SITE' | 'REMOTE' | 'HYBRID';
+    company: {
+        name: string;
+        id: string;
+    };
+};
+
 export type CompanyProfileDto = {
     id: string;
     name: string;
@@ -171,6 +183,33 @@ export type ResetPasswordResponse = {
 export type ResetPasswordRequest = {
     token: string;
     newPassword: string;
+};
+
+export type ApplyJobResponse = {
+    applicationId: string;
+    status: string;
+    appliedAt: string;
+};
+
+export type ApplyJobRequest = {
+    jobId: string;
+    resumeId: string;
+};
+
+export type ApplicationListDto = {
+    applicationId: string;
+    jobId: string;
+    jobTitle: string;
+    companyId: string;
+    companyName: string;
+    status: 'SUBMITTED' | 'UNDER_REVIEW' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+    appliedAt: string;
+};
+
+export type WithdrawApplicationResponse = {
+    status: string;
+    withdrawnAt: string;
+    message: string;
 };
 
 export type GetMyResumesData = {
@@ -363,6 +402,24 @@ export type SearchJobsResponses = {
 
 export type SearchJobsResponse2 = SearchJobsResponses[keyof SearchJobsResponses];
 
+export type GetJobDetailData = {
+    body?: never;
+    path: {
+        jobId: string;
+    };
+    query?: never;
+    url: '/jobs/{jobId}';
+};
+
+export type GetJobDetailResponses = {
+    /**
+     * OK
+     */
+    200: GetJobDetailResponse;
+};
+
+export type GetJobDetailResponse2 = GetJobDetailResponses[keyof GetJobDetailResponses];
+
 export type GetCompanyProfileData = {
     body?: never;
     path: {
@@ -480,3 +537,53 @@ export type ValidateResetTokenResponses = {
 };
 
 export type ValidateResetTokenResponse = ValidateResetTokenResponses[keyof ValidateResetTokenResponses];
+
+export type ApplyJobsData = {
+    body: ApplyJobRequest;
+    path?: never;
+    query?: never;
+    url: '/applications';
+};
+
+export type ApplyJobsResponses = {
+    /**
+     * Created
+     */
+    201: ApplyJobResponse;
+};
+
+export type ApplyJobsResponse = ApplyJobsResponses[keyof ApplyJobsResponses];
+
+export type GetMyApplicationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/applications/my';
+};
+
+export type GetMyApplicationsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ApplicationListDto>;
+};
+
+export type GetMyApplicationsResponse = GetMyApplicationsResponses[keyof GetMyApplicationsResponses];
+
+export type WithdrawApplicationData = {
+    body?: never;
+    path: {
+        applicationId: string;
+    };
+    query?: never;
+    url: '/applications/{applicationId}/withdraw';
+};
+
+export type WithdrawApplicationResponses = {
+    /**
+     * OK
+     */
+    200: WithdrawApplicationResponse;
+};
+
+export type WithdrawApplicationResponse2 = WithdrawApplicationResponses[keyof WithdrawApplicationResponses];

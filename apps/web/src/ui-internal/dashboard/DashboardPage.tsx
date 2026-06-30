@@ -12,7 +12,7 @@ import {
   ArrowRight,
   Sparkle
 } from "@phosphor-icons/react"
-import { getMyProfile } from "@/client"
+import { getMyProfile, getMyApplications } from "@/client"
 
 interface DashboardPageProps {
   userEmail: string
@@ -21,6 +21,7 @@ interface DashboardPageProps {
 
 export default function DashboardPage({ userEmail }: DashboardPageProps) {
   const [fullName, setFullName] = useState<string>("")
+  const [appCount, setAppCount] = useState<number>(0)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -33,7 +34,18 @@ export default function DashboardPage({ userEmail }: DashboardPageProps) {
         // ignore
       }
     }
+    const fetchApplications = async () => {
+      try {
+        const res = await getMyApplications({ throwOnError: true })
+        if (res.data) {
+          setAppCount(res.data.length)
+        }
+      } catch (err) {
+        // ignore
+      }
+    }
     fetchProfile()
+    fetchApplications()
   }, [])
 
   return (
@@ -84,17 +96,19 @@ export default function DashboardPage({ userEmail }: DashboardPageProps) {
             <div className="lg:col-span-2 space-y-8">
               {/* Stats Overview */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <Card className="border border-foreground/10 shadow-sm">
-                  <CardContent className="pt-5 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Applications</p>
-                      <h3 className="text-2xl font-black text-foreground mt-1">0</h3>
-                    </div>
-                    <div className="p-2.5 bg-secondary/50 text-foreground/75">
-                      <Briefcase size={20} />
-                    </div>
-                  </CardContent>
-                </Card>
+                <Link to="/applications" className="block hover:opacity-90 transition-all duration-200 cursor-pointer">
+                  <Card className="border border-foreground/10 shadow-sm h-full">
+                    <CardContent className="pt-5 flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Applications</p>
+                        <h3 className="text-2xl font-black text-foreground mt-1">{appCount}</h3>
+                      </div>
+                      <div className="p-2.5 bg-secondary/50 text-foreground/75">
+                        <Briefcase size={20} />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
 
                 <Card className="border border-foreground/10 shadow-sm">
                   <CardContent className="pt-5 flex items-center justify-between">

@@ -9,6 +9,8 @@ import ResetPasswordPage from "./ui-external/auth/ResetPassword"
 import JobDetailPage from "@/ui-external/public/JobDetailPage"
 import CompanyProfilePage from "@/ui-external/public/CompanyProfilePage"
 import ProfilePage from "@/ui-external/profile/ProfilePage"
+import ApplyJobPage from "@/ui-external/applications/ApplyJobPage"
+import MyApplicationsPage from "@/ui-external/applications/MyApplicationsPage"
 
 function AppContent() {
   const navigate = useNavigate()
@@ -96,6 +98,29 @@ function AppContent() {
         }
       />
 
+      {/* Protected Applications Routes */}
+      <Route
+        path="/applications"
+        element={
+          isLoggedIn ? (
+            <MyApplicationsPage />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
+      <Route
+        path="/jobs/:jobId/apply"
+        element={
+          isLoggedIn ? (
+            <ApplyJobPage />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
       {/* Fallback to Landing Page */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -109,3 +134,4 @@ export default function App() {
     </BrowserRouter>
   )
 }
+

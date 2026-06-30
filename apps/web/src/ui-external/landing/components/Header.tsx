@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/ui-shared/components/ui/button"
-import { GraduationCap, List, X, User, CaretDown, SignOut } from "@phosphor-icons/react"
+import { GraduationCap, List, X, User, CaretDown, SignOut, Briefcase } from "@phosphor-icons/react"
 
 export default function Header() {
   const navigate = useNavigate()
@@ -125,7 +125,7 @@ export default function Header() {
                       <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Signed in as</p>
                       <p className="text-xs font-semibold text-foreground truncate mt-0.5">{userEmail}</p>
                     </div>
-                    <div className="py-1">
+                    <div className="py-1 space-y-0.5">
                       <Link
                         id="my-profile-link"
                         to="/dashboard"
@@ -134,6 +134,15 @@ export default function Header() {
                       >
                         <User size={13} />
                         My Profile
+                      </Link>
+                      <Link
+                        id="my-applications-link"
+                        to="/applications"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-foreground/80 hover:text-brand hover:bg-brand/5 transition-colors"
+                      >
+                        <Briefcase size={13} />
+                        My Applications
                       </Link>
                     </div>
                     <div className="border-t border-foreground/10 py-1">
@@ -239,6 +248,14 @@ export default function Header() {
                   >
                     <User size={14} />
                     My Profile
+                  </Link>
+                  <Link
+                    to="/applications"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 py-2 text-xs font-bold uppercase tracking-wider text-foreground/80 hover:text-brand"
+                  >
+                    <Briefcase size={14} />
+                    My Applications
                   </Link>
                   <button
                     onClick={() => { setIsOpen(false); handleLogout() }}

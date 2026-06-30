@@ -62,10 +62,7 @@ export default function JobDetailPage() {
 
   const handleApply = () => {
     if (job.status !== "ACTIVE") return;
-    setHasApplied(true);
-    alert(
-      `Mock Application successful!\nYou have successfully applied for "${job.title}" at ${company.name}.\nThis is a simulation for this bachelor thesis project.`
-    );
+    navigate(`/jobs/${jobId}/apply`, { state: { job, company } });
   };
 
   const getStatusBadge = (status: string) => {
