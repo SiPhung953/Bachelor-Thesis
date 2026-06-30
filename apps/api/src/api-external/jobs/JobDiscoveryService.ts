@@ -1,8 +1,9 @@
-import { SearchJobsQuery } from './SearchJobsQuery';
-import { SearchJobsResponse } from './SearchJobsResponse';
-
 import { prisma } from '../../lib/prisma';
 import { HttpError } from '../../utils/HttpError';
+
+import { SearchJobsQuery } from './SearchJobsQuery';
+import { SearchJobsResponse } from './SearchJobsResponse';
+import { GetJobDetailResponse } from './GetJobDetailResponse';
 
 export class JobDiscoveryService {
     public async searchJobs(query: SearchJobsQuery): Promise<SearchJobsResponse> {
@@ -109,14 +110,51 @@ export class JobDiscoveryService {
             select: {
                 id: true,
                 title: true,
-                description: true,
                 employmentType: true,
                 location: true,
+
+                company: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
             },
         });
 
         return {
             items: jobs,
         };
+    }
+
+    public async getJobDetail(
+        jobId: string
+    ): Promise<GetJobDetailResponse> {
+        const job = await prisma.job.findFirst({
+            where: {
+                id: jobId,
+                status: "ACTIVE",
+            },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                location: true,
+                employmentType: true,
+
+                company: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+            },
+        });
+
+        if(!job){
+            throw new HttpError(404, "Job not found");
+        }
+
+        return job;
     }
 }
