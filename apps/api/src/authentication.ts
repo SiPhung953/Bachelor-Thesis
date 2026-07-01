@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { JwtService } from "./utils/JwtService";
 import { prisma } from './lib/prisma';
 import { HttpError } from './utils/HttpError';
+import { RoleConstant } from './api-shared/constant/RoleConstant';
 
 import { CurrentUser } from './security/CurrentAuthenticatedUser';
 
@@ -18,7 +19,7 @@ interface AuthenticatedRequest extends Request {
 export async function expressAuthentication(
     request: Request,
     securityName: string,
-    _scopes?: string[],
+    scopes?: string[],
     _response?: Response
 ): Promise<CurrentUser> {
     if (securityName !== "jwt") {
@@ -58,6 +59,16 @@ export async function expressAuthentication(
 
     if (user.status.toLowerCase() === "banned") {
         throw new HttpError(403, "Account is banned");
+    }
+
+    if (scopes && scopes.length > 0) {
+        const allowedRoleIds = scopes
+            .map(scope => RoleConstant[scope as keyof typeof RoleConstant])
+            .filter((roleId): roleId is RoleConstant => roleId !== undefined);
+            
+        if (!allowedRoleIds.includes(user.roleId as RoleConstant)) {
+            throw new HttpError(403, "Forbidden");
+        }
     }
 
     const currentUser: CurrentUser = {
