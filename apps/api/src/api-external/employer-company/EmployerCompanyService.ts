@@ -9,13 +9,14 @@ import { UpdateCompanyRequest } from './UpdateCompanyRequest';
 import { CompanyResponse } from './CompanyResponse';
 
 export class EmployerCompanyService {
-    // private helper function to check if the user is an employer
+    // private helper function to check if the user is an employer and is not banned
     private assertEmployer(currentUser: CurrentUser): void {
-        if (
-            currentUser?.roleId !== RoleConstant.EMPLOYER || 
-            currentUser.status === "BANNED"
-        ) {
+        if (currentUser?.roleId !== RoleConstant.EMPLOYER) {
             throw new HttpError(403, "Only Employer can perform this action.");
+
+        }
+        if (currentUser.status === "BANNED") {
+            throw new HttpError(403, "Your account has been banned.");
         }
     }
 
