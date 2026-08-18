@@ -5,12 +5,23 @@
   "spec": {
     "outputDirectory": "src/generated",
     "specVersion": 3,
+    "name": "Online Recruitment Platform API",
+    "description": "API for the Bachelor Thesis Online Recruitment Platform - supporting job discovery, user authentication, profile management, job applications, employer job management, and admin moderation workflows.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Phung Dam Tien Si"
+    },
     "securityDefinitions": {
       "jwt": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }
+    },
+    "spec": {
+      "servers": [
+        { "url": "http://localhost:3000", "description": "Local development" }
+      ]
     }
   },
   "routes": {
