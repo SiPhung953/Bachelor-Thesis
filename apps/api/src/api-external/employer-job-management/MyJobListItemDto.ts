@@ -1,4 +1,4 @@
-export interface GetMyJobsListResponse {
+export interface MyJobListItemDto {
     jobId: string;
     title: string;
     employmentType: string;
