@@ -67,7 +67,7 @@ model Job {
   status              JobStatus
   deadline            DateTime
   createdAt           DateTime       @default(now()) @map("created_at")
-  updatedAt           DateTime?      @default(now()) @map("updated_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
   closedAt            DateTime?      @map("closed_at")
   deletedAt           DateTime?      @map("deleted_at")
   approvedAt          DateTime?      @map("approved_at")
@@ -89,7 +89,7 @@ model Company {
   city            String
   description     String
   createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @default(now()) @map("updated_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   ownerEmployer User  @relation(fields: [ownerEmployerId], references: [id])
   jobs          Job[]
