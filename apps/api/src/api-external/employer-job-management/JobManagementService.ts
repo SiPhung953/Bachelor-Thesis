@@ -136,7 +136,7 @@ export class JobManagementService {
         });
 
         if (!company) {
-            throw new HttpError(404, "Company not found.");
+            throw new HttpError(400, "You have to create a Company Profile to see your job postings.");
         }
 
         // 3. Find all job posted by the company
@@ -147,9 +147,7 @@ export class JobManagementService {
             select: {
                 id: true,
                 title: true,
-                description: true,
                 location: true,
-                requirement: true,
                 employmentType: true,
                 status: true,
                 deadline: true,
@@ -169,9 +167,7 @@ export class JobManagementService {
             items: jobs.map(job => ({
                 jobId: job.id,
                 title: job.title,
-                description: job.description,
                 location: job.location,
-                requirement: job.requirement,
                 employmentType: job.employmentType,
                 status: job.status,
                 deadline: job.deadline,
@@ -251,7 +247,6 @@ export class JobManagementService {
                 location: true,
                 requirement: true,
                 employmentType: true,
-                status: true,
                 deadline: true,
                 createdAt: true,
             },
@@ -315,7 +310,6 @@ export class JobManagementService {
                 requirement: true,
                 employmentType: true,
                 location: true,
-                status: true,
                 deadline: true,
                 updatedAt: true,
             },
