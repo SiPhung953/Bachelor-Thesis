@@ -20,7 +20,6 @@ export class JobManagementService {
     private assertEmployer(currentUser: CurrentUser): void {
         if (currentUser?.roleId !== RoleConstant.EMPLOYER) {
             throw new HttpError(403, "Only Employer can perform this action.");
-
         }
         if (currentUser.status === "BANNED") {
             throw new HttpError(403, "Your account has been banned.");
@@ -34,6 +33,7 @@ export class JobManagementService {
                 id: jobId
             },
             select: {
+                id: true,
                 createdByEmployerId: true,
                 title: true,
                 description: true,
@@ -57,7 +57,7 @@ export class JobManagementService {
         }
 
         if (job.createdByEmployerId !== currentUser.id) {
-            throw new HttpError(403, "You are not allowed to manage this job posting");
+            throw new HttpError(403, "You are not allowed to manage this job posting.");
         }
 
         return job;
@@ -194,7 +194,7 @@ export class JobManagementService {
 
         // 3. Select every field existed for a job
         return {
-            jobId: jobId,
+            jobId: jobInfo.id,
             title: jobInfo.title,
             description: jobInfo.description,
             requirement: jobInfo.requirement,
@@ -365,7 +365,6 @@ export class JobManagementService {
             },
             select: {
                 id: true,
-                status: true,
                 closedAt: true,
             },
         });
@@ -378,6 +377,7 @@ export class JobManagementService {
         }
     }
 
+    // Depending on the design decision, this function may not be used
     public async reopenJobPosting(
         currentUser: CurrentUser,
         jobId: string
@@ -407,7 +407,7 @@ export class JobManagementService {
             // since this use case is an extension of Update Job Posting
             // so the deadline will be updated by updateJobPosting()
             data: {
-                status: "PENDING_APPROVAL", // Feels like if an employer want to update the job posting, they need to go through updateJobPosting() anyway. That might be a Frontend desing decision.
+                status: "PENDING_APPROVAL",
                 closedAt: null,
                 approvedAt: null,
                 rejectedAt: null,
@@ -415,7 +415,6 @@ export class JobManagementService {
             },
             select: {
                 id: true,
-                status: true, // Now that I thing about it, is this status select redundant? We have already hardcoded the status type in the return anyway.
             },
         });
 
@@ -452,7 +451,6 @@ export class JobManagementService {
             },
             select: {
                 id: true,
-                status: true,
                 deletedAt: true,
             },
         });

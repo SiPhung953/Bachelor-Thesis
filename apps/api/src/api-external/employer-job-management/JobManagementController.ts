@@ -41,7 +41,7 @@ export class JobManagementController extends Controller {
     @Get()
     public async getMyJobs(
         @Request() request: AuthenticatedRequest
-    ): Promise<GetMyJobsResponse[]> {
+    ): Promise<GetMyJobsResponse> {
         this.setStatus(200);
         return this.jobManagementService.getMyJobs(request.currentUser);
     }

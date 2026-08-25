@@ -14,7 +14,6 @@ export class ApplicationService {
     private assertJobSeeker(currentUser: CurrentUser): void {
         if (currentUser?.roleId !== RoleConstant.JOB_SEEKER) {
             throw new HttpError(403, "Only Job Seekers can perform this action.");
-
         }
         if (currentUser.status === "BANNED") {
             throw new HttpError(403, "Your account has been banned.");
