@@ -1,8 +1,8 @@
 import { prisma } from '../../lib/prisma';
 import { HttpError } from '../../utils/HttpError';
-import { RoleConstant } from '../../api-shared/constant/RoleConstant';
 
 import { CurrentUser } from '../../security/CurrentAuthenticatedUser';
+import { assertEmployer } from '../../api-shared/guard/AssertRole';
 
 import { JobPostingBody } from './JobPostingBody';
 import { GetMyJobsResponse } from './GetMyJobsResponse';
@@ -16,16 +16,6 @@ import { ReopenJobPostingResponse } from './ReopenJobPostingResponse';
 import { DeleteJobPostingResponse } from './DeleteJobPostingResponse';
 
 export class JobManagementService {
-    // private helper function to check if the user is an employer and is not banned
-    private assertEmployer(currentUser: CurrentUser): void {
-        if (currentUser?.roleId !== RoleConstant.EMPLOYER) {
-            throw new HttpError(403, "Only Employer can perform this action.");
-        }
-        if (currentUser.status === "BANNED") {
-            throw new HttpError(403, "Your account has been banned.");
-        }
-    }
-
     // Helper function for checking job existence and ownership
     private async findOwnedJobs(currentUser: CurrentUser, jobId: string) {
         const job = await prisma.job.findUnique({
@@ -122,8 +112,8 @@ export class JobManagementService {
     public async getMyJobs(
         currentUser: CurrentUser
     ): Promise<GetMyJobsResponse> {
-        // 1. If the user is not a EMPLOYER or is banned, they can't perform the action
-        this.assertEmployer(currentUser);
+        // 1. Check whether user is an Employer
+        assertEmployer(currentUser);
 
         // 2. Find all job posted by the company
         const jobs = await prisma.job.findMany({
@@ -166,8 +156,8 @@ export class JobManagementService {
         currentUser: CurrentUser,
         jobId: string
     ): Promise<GetMyJobDetailResponse> {
-        // 1. If the user is not a EMPLOYER or is banned, they can't perform the action
-        this.assertEmployer(currentUser);
+        // 1. Check whether user is an Employer
+        assertEmployer(currentUser);
 
         // 2. Find job by id belonging to the company
         const jobInfo = await this.findOwnedJobs(currentUser, jobId);
@@ -196,8 +186,8 @@ export class JobManagementService {
         currentUser: CurrentUser,
         requestBody: CreateJobPostingRequest
     ): Promise<CreateJobPostingResponse> {
-        // 1. If the user is not a EMPLOYER or is banned, they can't perform the action
-        this.assertEmployer(currentUser);
+        // 1. Check whether user is an Employer
+        assertEmployer(currentUser);
 
         // 2. Check whether the user have a company profile
         const company = await prisma.company.findUnique({
@@ -254,8 +244,8 @@ export class JobManagementService {
         jobId: string,
         requestBody: UpdateJobPostingRequest
     ): Promise<UpdateJobPostingResponse> {
-        // 1. If the user is not a EMPLOYER or is banned, they can't perform the action
-        this.assertEmployer(currentUser);
+        // 1. Check whether user is an Employer
+        assertEmployer(currentUser);
 
         // 2. Find job by id belonging to the company
         const jobInfo = await this.findOwnedJobs(currentUser, jobId);
@@ -316,8 +306,8 @@ export class JobManagementService {
         currentUser: CurrentUser,
         jobId: string
     ): Promise<CloseJobPostingResponse> {
-        // 1. If the user is not a EMPLOYER or is banned, they can't perform the action
-        this.assertEmployer(currentUser);
+        // 1. Check whether user is an Employer
+        assertEmployer(currentUser);
 
         // 2. Find job by id belonging to the company
         const jobInfo = await this.findOwnedJobs(currentUser, jobId);
@@ -360,8 +350,8 @@ export class JobManagementService {
         currentUser: CurrentUser,
         jobId: string
     ): Promise<ReopenJobPostingResponse> {
-        // 1. If the user is not a EMPLOYER or is banned, they can't perform the action
-        this.assertEmployer(currentUser);
+        // 1. Check whether user is an Employer
+        assertEmployer(currentUser);
 
         // 2. Find job by id belonging to the company
         const jobInfo = await this.findOwnedJobs(currentUser, jobId);
@@ -407,8 +397,8 @@ export class JobManagementService {
         currentUser: CurrentUser,
         jobId: string
     ): Promise<DeleteJobPostingResponse> {
-        // 1. If the user is not a EMPLOYER or is banned, they can't perform the action
-        this.assertEmployer(currentUser);
+        // 1. Check whether user is an Employer
+        assertEmployer(currentUser);
 
         // 2. Find job by id belonging to the company
         const jobInfo = await this.findOwnedJobs(currentUser, jobId);

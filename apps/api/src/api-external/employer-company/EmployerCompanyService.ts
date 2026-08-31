@@ -1,30 +1,19 @@
 import { prisma } from '../../lib/prisma';
 import { HttpError } from '../../utils/HttpError';
-import { RoleConstant } from '../../api-shared/constant/RoleConstant';
 
 import { CurrentUser } from '../../security/CurrentAuthenticatedUser';
+import { assertEmployer } from '../../api-shared/guard/AssertRole';
 
 import { CreateCompanyRequest } from './CreateCompanyRequest';
 import { UpdateCompanyRequest } from './UpdateCompanyRequest';
 import { CompanyResponse } from './CompanyResponse';
 
 export class EmployerCompanyService {
-    // private helper function to check if the user is an employer and is not banned
-    private assertEmployer(currentUser: CurrentUser): void {
-        if (currentUser?.roleId !== RoleConstant.EMPLOYER) {
-            throw new HttpError(403, "Only Employer can perform this action.");
-
-        }
-        if (currentUser.status === "BANNED") {
-            throw new HttpError(403, "Your account has been banned.");
-        }
-    }
-
     public async getCompany(
         currentUser: CurrentUser
     ): Promise<CompanyResponse> {
-        // 1. If the user is not authenticated or is banned, they can't access this feature
-        this.assertEmployer(currentUser);
+        // 1. Check whether user is an Employer
+        assertEmployer(currentUser);
 
         // 2. Check whether the Employer has a company
         const company = await prisma.company.findUnique({
@@ -61,8 +50,8 @@ export class EmployerCompanyService {
         currentUser: CurrentUser, 
         requestBody: CreateCompanyRequest
     ): Promise<CompanyResponse> {
-        // 1. If the user is not authenticated or is banned, they can't access this feature
-        this.assertEmployer(currentUser);
+        // 1. Check whether user is an Employer
+        assertEmployer(currentUser);
 
         // 2. Check whether the Employer already has a company
         const company = await prisma.company.findUnique({
@@ -112,8 +101,8 @@ export class EmployerCompanyService {
         currentUser: CurrentUser,
         requestBody: UpdateCompanyRequest
     ): Promise<CompanyResponse> {
-        // 1. If the user is not authenticated or is banned, they can't access this feature
-        this.assertEmployer(currentUser);
+        // 1. Check whether user is an Employer
+        assertEmployer(currentUser);
 
         // 2. Check whether the Employer already has a company
         const company = await prisma.company.findUnique({

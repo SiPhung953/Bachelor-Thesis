@@ -1,6 +1,6 @@
 import { prisma } from '../../lib/prisma';
 import { HttpError } from '../../utils/HttpError';
-import { RoleConstant } from '../../api-shared/constant/RoleConstant';
+import { assertJobSeeker } from '../../api-shared/guard/AssertRole';
 
 import { CurrentUser } from '../../security/CurrentAuthenticatedUser';
 
@@ -10,22 +10,12 @@ import { ApplicationListDto } from './ApplicationListDto';
 import { WithdrawApplicationResponse } from './WithdrawApplicationResponse';
 
 export class ApplicationService {
-    // private helper function to check if the user is a job seeker and is not banned
-    private assertJobSeeker(currentUser: CurrentUser): void {
-        if (currentUser?.roleId !== RoleConstant.JOB_SEEKER) {
-            throw new HttpError(403, "Only Job Seekers can perform this action.");
-        }
-        if (currentUser.status === "BANNED") {
-            throw new HttpError(403, "Your account has been banned.");
-        }
-    }
-
     public async applyJob(
         currentUser: CurrentUser,
         requestBody: ApplyJobRequest
     ): Promise<ApplyJobResponse> {
-        // 1. If the user is not a JOB_SEEKER or is banned, they can't apply
-        this.assertJobSeeker(currentUser);
+        // 1. Check whether user is a Job Seeker
+        assertJobSeeker(currentUser);
 
         // 2. Check whether Job exist and ACTIVE
         const job = await prisma.job.findUnique({
@@ -95,7 +85,7 @@ export class ApplicationService {
     }
 
     public async getMyApplications(currentUser: CurrentUser): Promise<ApplicationListDto[]> {
-        this.assertJobSeeker(currentUser);
+        assertJobSeeker(currentUser);
 
         const applications = await prisma.application.findMany({
             where: { userId: currentUser.id },
@@ -145,7 +135,7 @@ export class ApplicationService {
         currentUser: CurrentUser,
         applicationId: string
     ): Promise<WithdrawApplicationResponse> {
-        this.assertJobSeeker(currentUser);
+        assertJobSeeker(currentUser);
 
         const application = await prisma.application.findUnique({
             where: { id: applicationId },
