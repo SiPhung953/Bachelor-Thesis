@@ -26,7 +26,7 @@ interface AuthenticatedRequest extends ExpressRequest {
 
 @Tags("Applications")
 @Route("applications")
-@Security("jwt")
+@Security("jwt", ["JOB_SEEKER"])
 export class ApplicationController extends Controller {
     private readonly applicationService = new ApplicationService()
 

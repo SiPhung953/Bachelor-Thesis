@@ -1,6 +1,8 @@
 import { prisma } from '../../lib/prisma';
 import { HttpError } from '../../utils/HttpError';
 import { FileStorageService } from '../../utils/FileStorageService';
+import { CurrentUser } from '../../security/CurrentAuthenticatedUser';
+import { assertJobSeeker } from '../../api-shared/guard/AssertRole';
 
 import { UploadResumeResponse } from './UploadResumeResponse';
 import { GetMyResumeResponse } from './GetMyResumesResponse';
@@ -22,20 +24,23 @@ function isAllowedMimeType(mimeType: string): mimeType is MimeFileType {
 export class ResumeService {
     private readonly fileStorageService = new FileStorageService();
 
-    public async getMyResumes(userId: string): Promise<GetMyResumeResponse> {
+    public async getMyResumes(currentUser: CurrentUser): Promise<GetMyResumeResponse> {
+        // 1. Assert current user is a job seeker
+        assertJobSeeker(currentUser);
+
+        // 2. Find and return resumes list
         const resumes = await prisma.resume.findMany({
-            // Find and return resumes list
             where: {
-                // 1. Find resumes associated with userId that are not deleted
-                userId,
+                // 2.1 Find resumes associated with userId that are not deleted
+                userId: currentUser.id,
                 deletedAt: null,
             },
             orderBy: {
-                // 2. Order from newest to oldest
+                // 2.2 Order from newest to oldest
                 uploadedAt: "desc",
             },
             select: {
-                // 3. Return only needed fields
+                // 2.3 Return only needed fields
                 id: true,
                 title: true,
                 fileUrl: true,
@@ -49,11 +54,14 @@ export class ResumeService {
     }
 
     public async uploadResume(
-        userId: string,
+        currentUser: CurrentUser,
         resumeTitle: string,
         resumeFile: Express.Multer.File
     ): Promise<UploadResumeResponse> {
-        // 1. Check whether the user: 
+        // 1. Assert current user is a job seeker
+        assertJobSeeker(currentUser);
+
+        // 2. Check whether the user: 
         // Named their CV
         if (!resumeTitle || resumeTitle.trim().length === 0) {
             throw new HttpError(400, "CV title is required");
@@ -71,7 +79,7 @@ export class ResumeService {
             throw new HttpError(400, "Only PDF, DOC and DOCX files are supported");
         }
 
-        // 2. Configuration for local file storing
+        // 3. Configuration for local file storing
         const fileType = MIME_TO_FILE_TYPE[resumeFile.mimetype];
 
         // Save the file using FileStorageService
@@ -80,7 +88,7 @@ export class ResumeService {
         // Create resume in the database
         const resume = await prisma.resume.create({
             data: {
-                userId,
+                userId: currentUser.id,
                 title: resumeTitle.trim(),
                 fileUrl,
                 fileSize: resumeFile.size,
@@ -102,7 +110,12 @@ export class ResumeService {
         };
     }
 
-    public async deleteResume(userId: string, resumeId: string) {
+    public async deleteResume(
+        currentUser: CurrentUser,
+        resumeId: string
+    ) {
+        assertJobSeeker(currentUser);
+
         const resume = await prisma.resume.findUnique({
             where: { id: resumeId },
             select: {
@@ -123,7 +136,7 @@ export class ResumeService {
             throw new HttpError(404, "CV not found");
         }
 
-        if (resume.userId !== userId) {
+        if (resume.userId !== currentUser.id) {
             throw new HttpError(403, "You cannot delete another user's CV");
         }
         // If the resume is already used in an application, prevent hard delete
