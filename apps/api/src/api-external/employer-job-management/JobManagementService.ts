@@ -125,21 +125,7 @@ export class JobManagementService {
         // 1. If the user is not a EMPLOYER or is banned, they can't perform the action
         this.assertEmployer(currentUser);
 
-        // 2. Check whether the user have a company profile
-        const company = await prisma.company.findUnique({
-            where: {
-                ownerEmployerId: currentUser.id,
-            },
-            select: {
-                id: true,
-            },
-        });
-
-        if (!company) {
-            throw new HttpError(400, "You have to create a Company Profile to see your job postings.");
-        }
-
-        // 3. Find all job posted by the company
+        // 2. Find all job posted by the company
         const jobs = await prisma.job.findMany({
             where: {
                 createdByEmployerId: currentUser.id,
@@ -160,10 +146,8 @@ export class JobManagementService {
             },
         });
 
-        // 4. Return all jobs of all status
+        // 3. Return all jobs of all status
         return {
-            hasCompany: true,
-            companyId: company.id,
             items: jobs.map(job => ({
                 jobId: job.id,
                 title: job.title,
