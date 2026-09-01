@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "predev": "tsoa spec-and-routes",
     "prebuild": "shx rm -rf dist && shx rm -f tsconfig.tsbuildinfo",
+    
+    "dev": "tsx watch src/server.ts",
     "build": "tsoa spec-and-routes && tsc && shx mkdir -p dist/email/templates && shx cp -r src/email/templates/. dist/email/templates/",
     "start": "node dist/server.js"
   },

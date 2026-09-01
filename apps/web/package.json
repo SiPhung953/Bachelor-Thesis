@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "pnpm generate:api",
+    "prebuild": "pnpm generate:api",
+
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
