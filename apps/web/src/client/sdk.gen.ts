@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { ApplyJobsData, ApplyJobsResponses, AuthenticateUserData, AuthenticateUserResponses, ChangeAvatarData, ChangeAvatarResponses, ChangePasswordData, ChangePasswordResponses, DeleteResumeData, DeleteResumeResponses, GetCompanyProfileData, GetCompanyProfileResponses, GetJobDetailData, GetJobDetailResponses, GetJobPreferenceData, GetJobPreferenceResponses, GetMyApplicationsData, GetMyApplicationsResponses, GetMyProfileData, GetMyProfileResponses, GetMyResumesData, GetMyResumesResponses, LogoutUserData, LogoutUserResponses, RegisterUserData, RegisterUserResponses, RequestPasswordResetData, RequestPasswordResetResponses, ResetPasswordData, ResetPasswordResponses, SearchJobsData, SearchJobsResponses, UpdateJobPreferenceData, UpdateJobPreferenceResponses, UpdatePersonalInformationData, UpdatePersonalInformationResponses, UploadResumeData, UploadResumeResponses, ValidateResetTokenData, ValidateResetTokenResponses, WithdrawApplicationData, WithdrawApplicationResponses } from './types.gen';
+import type { ApplyJobsData, ApplyJobsResponses, AuthenticateUserData, AuthenticateUserResponses, ChangeAvatarData, ChangeAvatarResponses, ChangePasswordData, ChangePasswordResponses, CloseJobPostingData, CloseJobPostingResponses, CreateCompanyData, CreateCompanyResponses, CreateJobPostingData, CreateJobPostingResponses, DeleteJobPostingData, DeleteJobPostingResponses, DeleteResumeData, DeleteResumeResponses, GetCompanyData, GetCompanyProfileData, GetCompanyProfileResponses, GetCompanyResponses, GetJobApplicationDetailData, GetJobApplicationDetailResponses, GetJobApplicationsData, GetJobApplicationsResponses, GetJobDetailData, GetJobDetailResponses, GetJobPreferenceData, GetJobPreferenceResponses, GetMyApplicationsData, GetMyApplicationsResponses, GetMyJobDetailData, GetMyJobDetailResponses, GetMyJobsData, GetMyJobsResponses, GetMyProfileData, GetMyProfileResponses, GetMyResumesData, GetMyResumesResponses, LogoutUserData, LogoutUserResponses, PutApplicationUnderReviewData, PutApplicationUnderReviewResponses, RegisterUserData, RegisterUserResponses, ReopenJobPostingData, ReopenJobPostingResponses, RequestPasswordResetData, RequestPasswordResetResponses, ResetPasswordData, ResetPasswordResponses, SearchJobsData, SearchJobsResponses, UpdateApplicationStatusData, UpdateApplicationStatusResponses, UpdateCompanyData, UpdateCompanyResponses, UpdateJobPostingData, UpdateJobPostingResponses, UpdateJobPreferenceData, UpdateJobPreferenceResponses, UpdatePersonalInformationData, UpdatePersonalInformationResponses, UploadResumeData, UploadResumeResponses, ValidateResetTokenData, ValidateResetTokenResponses, WithdrawApplicationData, WithdrawApplicationResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -41,6 +41,12 @@ export const deleteResume = <ThrowOnError extends boolean = false>(options: Opti
     responseType: 'json',
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/users/me/resumes/{resumeId}',
+    ...options
+});
+
+export const getCompanyProfile = <ThrowOnError extends boolean = false>(options: Options<GetCompanyProfileData, ThrowOnError>) => (options.client ?? client).get<GetCompanyProfileResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    url: '/companies/{companyId}',
     ...options
 });
 
@@ -115,10 +121,147 @@ export const getJobDetail = <ThrowOnError extends boolean = false>(options: Opti
     ...options
 });
 
-export const getCompanyProfile = <ThrowOnError extends boolean = false>(options: Options<GetCompanyProfileData, ThrowOnError>) => (options.client ?? client).get<GetCompanyProfileResponses, unknown, ThrowOnError>({
+export const applyJobs = <ThrowOnError extends boolean = false>(options: Options<ApplyJobsData, ThrowOnError>) => (options.client ?? client).post<ApplyJobsResponses, unknown, ThrowOnError>({
     responseType: 'json',
-    url: '/companies/{companyId}',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/applications',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const getMyApplications = <ThrowOnError extends boolean = false>(options?: Options<GetMyApplicationsData, ThrowOnError>) => (options?.client ?? client).get<GetMyApplicationsResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/applications/my',
     ...options
+});
+
+export const withdrawApplication = <ThrowOnError extends boolean = false>(options: Options<WithdrawApplicationData, ThrowOnError>) => (options.client ?? client).patch<WithdrawApplicationResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/applications/{applicationId}/withdraw',
+    ...options
+});
+
+export const getMyJobs = <ThrowOnError extends boolean = false>(options?: Options<GetMyJobsData, ThrowOnError>) => (options?.client ?? client).get<GetMyJobsResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/jobs',
+    ...options
+});
+
+export const createJobPosting = <ThrowOnError extends boolean = false>(options: Options<CreateJobPostingData, ThrowOnError>) => (options.client ?? client).post<CreateJobPostingResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/jobs',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const getMyJobDetail = <ThrowOnError extends boolean = false>(options: Options<GetMyJobDetailData, ThrowOnError>) => (options.client ?? client).get<GetMyJobDetailResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/jobs/{jobId}',
+    ...options
+});
+
+export const updateJobPosting = <ThrowOnError extends boolean = false>(options: Options<UpdateJobPostingData, ThrowOnError>) => (options.client ?? client).patch<UpdateJobPostingResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/jobs/{jobId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const closeJobPosting = <ThrowOnError extends boolean = false>(options: Options<CloseJobPostingData, ThrowOnError>) => (options.client ?? client).patch<CloseJobPostingResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/jobs/{jobId}/close',
+    ...options
+});
+
+export const reopenJobPosting = <ThrowOnError extends boolean = false>(options: Options<ReopenJobPostingData, ThrowOnError>) => (options.client ?? client).patch<ReopenJobPostingResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/jobs/{jobId}/reopen',
+    ...options
+});
+
+export const deleteJobPosting = <ThrowOnError extends boolean = false>(options: Options<DeleteJobPostingData, ThrowOnError>) => (options.client ?? client).patch<DeleteJobPostingResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/jobs/{jobId}/delete',
+    ...options
+});
+
+export const getCompany = <ThrowOnError extends boolean = false>(options?: Options<GetCompanyData, ThrowOnError>) => (options?.client ?? client).get<GetCompanyResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/company',
+    ...options
+});
+
+export const updateCompany = <ThrowOnError extends boolean = false>(options: Options<UpdateCompanyData, ThrowOnError>) => (options.client ?? client).patch<UpdateCompanyResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/company',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const createCompany = <ThrowOnError extends boolean = false>(options: Options<CreateCompanyData, ThrowOnError>) => (options.client ?? client).post<CreateCompanyResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/company',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const getJobApplications = <ThrowOnError extends boolean = false>(options: Options<GetJobApplicationsData, ThrowOnError>) => (options.client ?? client).get<GetJobApplicationsResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/jobs/{jobId}/applications',
+    ...options
+});
+
+export const getJobApplicationDetail = <ThrowOnError extends boolean = false>(options: Options<GetJobApplicationDetailData, ThrowOnError>) => (options.client ?? client).get<GetJobApplicationDetailResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/applications/{applicationId}',
+    ...options
+});
+
+export const putApplicationUnderReview = <ThrowOnError extends boolean = false>(options: Options<PutApplicationUnderReviewData, ThrowOnError>) => (options.client ?? client).patch<PutApplicationUnderReviewResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/applications/{applicationId}/under-review',
+    ...options
+});
+
+export const updateApplicationStatus = <ThrowOnError extends boolean = false>(options: Options<UpdateApplicationStatusData, ThrowOnError>) => (options.client ?? client).patch<UpdateApplicationStatusResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/employer/applications/{applicationId}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 export const authenticateUser = <ThrowOnError extends boolean = false>(options: Options<AuthenticateUserData, ThrowOnError>) => (options.client ?? client).post<AuthenticateUserResponses, unknown, ThrowOnError>({
@@ -170,30 +313,5 @@ export const resetPassword = <ThrowOnError extends boolean = false>(options: Opt
 export const validateResetToken = <ThrowOnError extends boolean = false>(options: Options<ValidateResetTokenData, ThrowOnError>) => (options.client ?? client).get<ValidateResetTokenResponses, unknown, ThrowOnError>({
     responseType: 'json',
     url: '/auth/reset-password/validate',
-    ...options
-});
-
-export const applyJobs = <ThrowOnError extends boolean = false>(options: Options<ApplyJobsData, ThrowOnError>) => (options.client ?? client).post<ApplyJobsResponses, unknown, ThrowOnError>({
-    responseType: 'json',
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/applications',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const getMyApplications = <ThrowOnError extends boolean = false>(options?: Options<GetMyApplicationsData, ThrowOnError>) => (options?.client ?? client).get<GetMyApplicationsResponses, unknown, ThrowOnError>({
-    responseType: 'json',
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/applications/my',
-    ...options
-});
-
-export const withdrawApplication = <ThrowOnError extends boolean = false>(options: Options<WithdrawApplicationData, ThrowOnError>) => (options.client ?? client).patch<WithdrawApplicationResponses, unknown, ThrowOnError>({
-    responseType: 'json',
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/applications/{applicationId}/withdraw',
     ...options
 });
