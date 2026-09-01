@@ -80,4 +80,3 @@ Length caps are `400`, not `413`. Ownership checks are 404-then-403.
 
 - Nothing ever sets `JobStatus.EXPIRED`. Public search and `applyJob` filter on `status: 'ACTIVE'` without a deadline check, so past-deadline jobs stay visible and still accept applications, contradicting UC-EMP-01.
 - `api-internal/` (moderation) is empty — no way to move a job to `ACTIVE` except by editing the database.
-- `employer-application-management/` is stubbed (UC-EMP-06 – UC-EMP-08).
