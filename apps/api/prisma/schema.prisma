@@ -158,6 +158,7 @@ model Application {
   appliedAt       DateTime          @default(now()) @map("applied_at")
   underReviewAt   DateTime?         @map("under_review_at")
   updatedAt       DateTime          @updatedAt @map("updated_at")
+  decidedAt       DateTime?         @map("decided_at")
   rejectionReason String?           @map("rejection_reason")
   withdrawnAt     DateTime?         @map("withdrawn_at")
 
