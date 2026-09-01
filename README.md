@@ -105,12 +105,31 @@ Both modules may contain public and authenticated routes - the distinction is **
 
 ### `ui-external` vs `ui-internal` (Frontend)
 
-The `apps/web/src/` directory uses two top-level modules to separate pages by auth gate:
+The `apps/web/src/` directory uses the **same axis as the backend**: which human actor the UI serves.
 
-- **`ui-external/`** - Pages accessible **without authentication**: landing page, public job/company views, auth pages (login, register, forgot password), and profile/applications pages (which handle their own auth checks inline).
-- **`ui-internal/`** - Pages that **require authentication** and are only accessible after login: the authenticated user dashboard.
+- **`ui-external/`** - Pages for the **end-user personas** (Job Seeker and Employer). Contains both public pages (landing, job search, job detail, auth) and authenticated pages (dashboard, profile, applications, employer job management).
+- **`ui-internal/`** - Pages for the **Admin/Moderator persona** (moderation, user management). Not yet implemented, mirroring the empty `api-internal/`.
+- **`ui-shared/`** - Components used by both: `components/ui/` for shadcn primitives, `components/` for shared app components.
 
-Note: The frontend split is by **auth gate** (guest vs logged-in), while the backend split is by **actor persona** (end-user vs admin). These are different dimensions - the naming overlap is intentional but the criteria differ.
+Authentication is **not** the axis. Whether a page requires login is enforced by route guards in `App.tsx`, not by which folder it lives in.
+
+### Feature folders
+
+Inside `ui-external/`, feature folders mirror the backend folder names wherever the same use cases are involved, so a feature can be traced end to end:
+
+| Backend | Frontend |
+| :--- | :--- |
+| `api-external/employer-company/` | `ui-external/employer-company/` |
+| `api-external/employer-job-management/` | `ui-external/employer-job-management/` |
+| `api-external/employer-application-management/` | `ui-external/employer-application-management/` |
+| `api-external/job-application/` | `ui-external/applications/` |
+| `api-external/job-discovery/` | `ui-external/public/` |
+
+Page components sit at the folder root (`MyJobPostingsPage.tsx`); components used only by that feature go in its `components/` subfolder.
+
+<!-- ### Client-side guards are not access control
+
+Route guards decide **what is rendered**, not what a user is allowed to do. Every request is independently authorized server-side by `expressAuthentication` (JWT + ban check), the tsoa `@Security` scope, and `assertRole` in the service. A user who edits client state in DevTools reaches a page whose API calls return 401 or 403. -->
 
 ## Academic Scope
 
