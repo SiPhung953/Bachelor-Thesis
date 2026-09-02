@@ -200,7 +200,6 @@ function FormField({
 
 interface ProfilePageProps {
   userEmail: string
-  onLogout: () => void
 }
 
 export default function ProfilePage({ userEmail }: ProfilePageProps) {

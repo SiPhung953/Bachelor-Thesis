@@ -16,7 +16,6 @@ import { getMyProfile, getMyApplications } from "@/client"
 
 interface DashboardPageProps {
   userEmail: string
-  onLogout: () => void
 }
 
 export default function DashboardPage({ userEmail }: DashboardPageProps) {
