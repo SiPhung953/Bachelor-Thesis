@@ -13,7 +13,6 @@ import {
   CircleNotch,
   CheckCircle,
   FilePdf,
-  WarningCircle,
   Plus,
 } from "@phosphor-icons/react"
 import { getJobDetail, getMyResumes, applyJobs } from "@/client"

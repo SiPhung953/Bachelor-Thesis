@@ -22,7 +22,7 @@ import { mockJobs, mockCompanies } from "./mockData";
 export default function JobDetailPage() {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
-  const [hasApplied, setHasApplied] = useState(false);
+  const [hasApplied] = useState(false);
 
   const job = mockJobs.find((j) => j.id === jobId);
   const company = job ? mockCompanies.find((c) => c.id === job.companyId) : undefined;

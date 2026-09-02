@@ -1,5 +1,5 @@
 import type { ResumeDto } from "@/client/types.gen"
-import { FilePdf, CalendarBlank, CheckCircle } from "@phosphor-icons/react"
+import { FilePdf, CalendarBlank } from "@phosphor-icons/react"
 
 interface ResumeSelectorProps {
   resumes: ResumeDto[]
