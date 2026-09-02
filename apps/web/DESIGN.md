@@ -61,8 +61,24 @@ To ensure visual consistency and code maintainability, developers must strictly 
 1.  **Tech Stack:**
     *   Framework: React + Vite + TypeScript.
     *   Styling: Tailwind CSS.
-    *   Primitives: Radix-based `shadcn/ui` components (e.g., Button, Card, Badge, Input, Label, Separator).
-2.  **No Extraneous Packages:** Avoid introducing another UI library. Build custom feature components under `apps/web/src/features/` using standard Tailwind utilities.
+    *   Primitives: Radix-based `shadcn/ui` components, installed into `src/ui-shared/components/ui/`.
+        Currently present: Badge, Button, Card, Input, Label, Separator. This is what happens to be
+        installed, not a closed set - add more from the shadcn registry as features need them.
+2.  **No Extraneous Packages:**
+    *   **shadcn/ui components may be added freely.** `shadcn add <component>` copies a file into
+        `src/ui-shared/components/ui/` and builds on the `radix-ui` package already in `package.json`;
+        it is scaffolding, not a new dependency. Prefer it over hand-styling a raw element, so base
+        styling lives in one file instead of being duplicated across pages.
+    *   **Check whether `pnpm add` actually runs.** A few components pull real dependencies
+        (`Calendar` → `react-day-picker`, `Chart` → `recharts`). Those need the same scrutiny as any
+        other package.
+    *   **Do not introduce a second UI library** (Material UI, Chakra, Ant), nor utility packages that
+        duplicate what Tailwind and shadcn already provide.
+    *   **Weigh abstraction against benefit.** `Textarea` wraps one element and is a clear win (refer to JobPostingForm.tsx :141-177).
+        `Select` is a five-component Radix composite - worth it for a long list, not for three
+        mutually exclusive options that read better as a segmented control (refer to JobPostingForm.tsx :113-139).
+    *   Feature components live under `ui-external/<feature>/components/`, page components at the
+        feature root. Every copied component becomes project code you maintain and a reader reviews.
 3.  **Simplicity & Purpose:** Keep pages simple, clean, and thesis-MVP friendly. Focus on layout, scannability, and basic user flows.
 4.  **Avoid Over-Engineered Animations:** Use subtle transitions (`transition-all duration-300`) for hovers. Do not introduce complex scroll animations or high-resource rendering loops.
 5.  **Strict Light Theme Focus:** Do not implement dark mode variations unless explicitly requested. Ensure all designs look pristine under the light theme.
