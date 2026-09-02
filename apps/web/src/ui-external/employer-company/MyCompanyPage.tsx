@@ -57,7 +57,7 @@ export default function MyCompanyPage() {
         }
         // 401 branch will not be included (redundancy/duplication/potential dead code)
         // The global interceptor in apiClient.ts handles session expiration centrally for all non-auth pages in the app
-        setError(err?.response?.data?.message ?? "Failed to load your company profile. Please try again later.")
+        setError(err?.response?.data?.message || "Failed to load your company profile. Please try again later.")
       } finally {
         setLoading(false)
       }

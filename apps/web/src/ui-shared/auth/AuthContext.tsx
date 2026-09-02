@@ -44,9 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(EMAIL_KEY)
-    localStorage.removeItem(ROLE_KEY)
+    clearStoredSession()
     setSession({ isLoggedIn: false, email: "", roleId: null })
   }
 
