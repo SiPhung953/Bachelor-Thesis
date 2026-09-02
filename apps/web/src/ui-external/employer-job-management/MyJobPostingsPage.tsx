@@ -77,11 +77,10 @@ export default function MyJobPostingsPage() {
     try {
       const res = await getMyJobs({ throwOnError: true })
       setJobs(res.data?.items ?? [])
+      return true
     } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          "Failed to load your job postings. Please try again later."
-      )
+      setError(err?.response?.data?.message || "Failed to load your job postings. Please try again later.")
+      return false
     } finally {
       setLoading(false)
     }
@@ -120,15 +119,13 @@ export default function MyJobPostingsPage() {
       }
 
       // Make the list reflect the change that just succeeded.
-      await fetchJobs()
-
+      if (await fetchJobs()) setSuccessMessage(DIALOG_COPY[action].successMessage)
       // Future work consideration: Update status in local UI state for instant UI feedback in place of awaiting request.
       // Similar to setApplication in MyApplicationPage
       // setJobs((prevJobs) => prevJobs.map((item) => if (item.jobId !== job.jobId) return item
       // ...
       // const newStatus: JobStatus
 
-      setSuccessMessage(DIALOG_COPY[action].successMessage)
       setTimeout(() => setSuccessMessage(null), 5000)
     } catch (err: any) {
       setError(
