@@ -14,6 +14,7 @@ import ApplyJobPage from "@/ui-external/applications/ApplyJobPage"
 import MyApplicationsPage from "@/ui-external/applications/MyApplicationsPage"
 import MyJobPostingsPage from "@/ui-external/employer-job-management/MyJobPostingsPage"
 import MyCompanyPage from "@/ui-external/employer-company/MyCompanyPage"
+import PostJobPage from "@/ui-external/employer-job-management/PostJobPage"
 
 function AppRoutes() {
   const navigate = useNavigate()
@@ -65,6 +66,7 @@ function AppRoutes() {
       <Route element={<RequireAuth role="EMPLOYER" />}>
         <Route path="/employer/company" element={<MyCompanyPage />} />
         <Route path="/employer/jobs" element={<MyJobPostingsPage />} />
+        <Route path="/employer/jobs/new" element={<PostJobPage />} />
       </Route>
 
       {/* ---------- Fallback ---------- */}
