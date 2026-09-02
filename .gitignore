@@ -73,3 +73,7 @@ test-results/
 .docker/
 docker-data/
 postgres-data/
+
+
+# Claude Code directory/configuration
+.claude/*
