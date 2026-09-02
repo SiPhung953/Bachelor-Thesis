@@ -1,4 +1,5 @@
 import { client } from "../client/client.gen";
+import { clearStoredSession } from "@/ui-shared/auth/AuthContext";
 
 // Configure client with baseURL, auth, and the mock adapter directly
 client.setConfig({
@@ -21,9 +22,8 @@ client.instance.interceptors.response.use(
 
     // Only intercept 401s that are NOT from auth endpoints
     if (status === 401 && !url.includes("/auth/")) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("userEmail");
-      window.location.href = "/login";
+      clearStoredSession();
+      window.location.href = "/login"; // Trigger a full page reload, remounting AuthProvider and re-reading storage.
     }
 
     return Promise.reject(error);

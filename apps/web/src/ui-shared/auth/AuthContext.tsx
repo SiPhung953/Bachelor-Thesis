@@ -68,3 +68,11 @@ export function useAuth(): AuthState {
   }
   return context
 }
+
+export function clearStoredSession() {
+  localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(EMAIL_KEY)
+  localStorage.removeItem(ROLE_KEY)
+  // React state is not updated here, because the caller (apiClient's 401 interceptor) triggers a full page reload, which remounts AuthProvider and re-reads storage.
+  // Calling this without a reload would leave the UI showing a logged-in user.
+}
