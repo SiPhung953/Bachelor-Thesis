@@ -80,3 +80,7 @@ Length caps are `400`, not `413`. Ownership checks are 404-then-403.
 
 - Nothing ever sets `JobStatus.EXPIRED`. Public search and `applyJob` filter on `status: 'ACTIVE'` without a deadline check, so past-deadline jobs stay visible and still accept applications, contradicting UC-EMP-01.
 - `api-internal/` (moderation) is empty — no way to move a job to `ACTIVE` except by editing the database.
+
+## Future work (not urgent)
+
+- **Dependency direction between `api/` and `ui-shared/auth/`.** `apps/web/src/api/apiClient.ts` imports `clearStoredSession` from `ui-shared/auth/AuthContext.tsx`, so the API layer depends on a React/JSX module. It works and there is no import cycle, but the arrow points the wrong way. Fix by moving the storage keys and `clearStoredSession` into a plain (non-React) `ui-shared/auth/SessionStorage.ts` that both `AuthContext` and `apiClient` import.
