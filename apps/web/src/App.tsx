@@ -1,127 +1,73 @@
-import { useState, useEffect } from "react"
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom"
+import { AuthProvider, useAuth } from "@/ui-shared/auth/AuthContext"
+import RequireAuth from "@/ui-shared/auth/RequireAuth"
 import { LoginPage } from "@/ui-external/auth/LoginPage"
 import ForgotPasswordPage from "@/ui-external/auth/ForgotPasswordPage"
 import RegisterPage from "@/ui-external/auth/RegisterPage"
+import ResetPasswordPage from "@/ui-external/auth/ResetPassword"
 import LandingPage from "@/ui-external/landing/LandingPage"
-import DashboardPage from "@/ui-external/dashboard/DashboardPage"
-import ResetPasswordPage from "./ui-external/auth/ResetPassword"
 import JobDetailPage from "@/ui-external/public/JobDetailPage"
 import CompanyProfilePage from "@/ui-external/public/CompanyProfilePage"
+import DashboardPage from "@/ui-external/dashboard/DashboardPage"
 import ProfilePage from "@/ui-external/profile/ProfilePage"
 import ApplyJobPage from "@/ui-external/applications/ApplyJobPage"
 import MyApplicationsPage from "@/ui-external/applications/MyApplicationsPage"
+import MyJobPostingsPage from "@/ui-external/employer-job-management/MyJobPostingsPage"
+import MyCompanyPage from "@/ui-external/employer-company/MyCompanyPage"
 
-function AppContent() {
+function AppRoutes() {
   const navigate = useNavigate()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userEmail, setUserEmail] = useState("")
+  const { isLoggedIn, email, isEmployer, login } = useAuth()
 
-  // Restore user session from localStorage if present
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken")
-    const email = localStorage.getItem("userEmail")
-    if (token && email) {
-      setIsLoggedIn(true)
-      setUserEmail(email)
-    }
-  }, [])
-
-  const handleLoginSuccess = (email: string) => {
-    setUserEmail(email)
-    setIsLoggedIn(true)
-    localStorage.setItem("userEmail", email)
-    navigate("/dashboard")
-  }
-
-  const handleLogout = () => {
-    setIsLoggedIn(false)
-    setUserEmail("")
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("userEmail")
-    navigate("/")
+  const handleLoginSuccess = (accessToken: string, userEmail: string, roleId: number) => {
+    login(accessToken, userEmail, roleId)
+    navigate(roleId === 2 ? "/employer/jobs" : "/dashboard")
   }
 
   return (
     <Routes>
-      {/* Public Landing Page */}
+      {/* ---------- Public ---------- */}
       <Route path="/" element={<LandingPage />} />
-
-      {/* Public Job Details Page */}
       <Route path="/jobs/:jobId" element={<JobDetailPage />} />
-
-      {/* Public Company Profile Page */}
       <Route path="/companies/:companyId" element={<CompanyProfilePage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-      {/* Public Registration Page */}
+      {/* ---------- Guest only ---------- */}
       <Route
         path="/register"
         element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <RegisterPage />}
       />
-
-      {/* Secure Sign In Page */}
       <Route
         path="/login"
         element={
           isLoggedIn ? (
-            <Navigate to="/dashboard" replace />
+            <Navigate to={isEmployer ? "/employer/jobs" : "/dashboard"} replace />
           ) : (
             <LoginPage onLoginSuccess={handleLoginSuccess} />
           )
         }
       />
 
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      {/* ---------- Any logged-in user ---------- */}
+      <Route element={<RequireAuth />}>
+        <Route path="/dashboard" element={<DashboardPage userEmail={email} />} />
+        <Route path="/profile" element={<ProfilePage userEmail={email} />} />
+      </Route>
 
-      {/* Protected Dashboard Route */}
-      <Route
-        path="/dashboard"
-        element={
-          isLoggedIn ? (
-            <DashboardPage userEmail={userEmail} onLogout={handleLogout} />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+      {/* ---------- Job Seeker only ---------- */}
+      <Route element={<RequireAuth role="JOB_SEEKER" />}>
+        <Route path="/applications" element={<MyApplicationsPage />} />
+        <Route path="/jobs/:jobId/apply" element={<ApplyJobPage />} />
+      </Route>
 
-      {/* Protected Profile Route */}
-      <Route
-        path="/profile"
-        element={
-          isLoggedIn ? (
-            <ProfilePage userEmail={userEmail} onLogout={handleLogout} />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+      {/* ---------- Employer only ---------- */}
+      <Route element={<RequireAuth role="EMPLOYER" />}>
+        <Route path="/employer/company" element={<MyCompanyPage />} />
+        <Route path="/employer/jobs" element={<MyJobPostingsPage />} />
+      </Route>
 
-      {/* Protected Applications Routes */}
-      <Route
-        path="/applications"
-        element={
-          isLoggedIn ? (
-            <MyApplicationsPage />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
-
-      <Route
-        path="/jobs/:jobId/apply"
-        element={
-          isLoggedIn ? (
-            <ApplyJobPage />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
-
-      {/* Fallback to Landing Page */}
+      {/* ---------- Fallback ---------- */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
@@ -130,8 +76,9 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   )
 }
-
