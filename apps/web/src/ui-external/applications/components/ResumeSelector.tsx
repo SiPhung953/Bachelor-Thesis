@@ -45,7 +45,7 @@ export default function ResumeSelector({ resumes, selectedId, onChange }: Resume
                 </h5>
                 <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
                   <CalendarBlank size={12} />
-                  <span>Uploaded on {formatDate(resume.createdAt)}</span>
+                  <span>Uploaded on {formatDate(resume.uploadedAt)}</span>
                 </div>
               </div>
             </div>
