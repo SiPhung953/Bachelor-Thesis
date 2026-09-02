@@ -6,6 +6,7 @@ import { Button } from "@/ui-shared/components/ui/button"
 import { Card, CardContent } from "@/ui-shared/components/ui/card"
 import { Input } from "@/ui-shared/components/ui/input"
 import { Label } from "@/ui-shared/components/ui/label"
+import { Textarea } from "@/ui-shared/components/ui/textarea"
 import ErrorAlert from "@/ui-shared/components/ErrorAlert"
 import LoadingSpinner from "@/ui-shared/components/LoadingSpinner"
 import { getCompany, createCompany, updateCompany } from "@/client"
@@ -206,7 +207,7 @@ export default function MyCompanyPage() {
                     >
                       Description
                     </Label>
-                    <textarea
+                    <Textarea
                       id="description"
                       value={form.description}
                       onChange={(e) => setField("description", e.target.value)}
@@ -214,7 +215,7 @@ export default function MyCompanyPage() {
                       rows={7}
                       maxLength={5000}
                       required
-                      className="w-full resize-y rounded-none border border-foreground/10 bg-transparent px-4 py-3 text-xs leading-relaxed placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
+                      className="resize-y border-foreground/10 px-4 py-3 leading-relaxed placeholder:text-muted-foreground/60 focus-visible:ring-brand/30"
                     />
                     <p className="text-right text-[10px] text-muted-foreground">
                       {form.description.length} / 5000
