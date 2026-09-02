@@ -25,7 +25,7 @@ import { authenticateUser } from "@/client"
 
 interface LoginPageProps {
   // Callback function to notify parent of successful login
-  onLoginSuccess: (email: string) => void
+  onLoginSuccess: (accessToken: string, email: string, roleId: number) => void
 }
 
 export function LoginPage({ onLoginSuccess }: LoginPageProps) {
@@ -75,11 +75,9 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
       })
       const data = response.data
 
-      // 2. Store jwt access token from Backend to local storage
-      localStorage.setItem("accessToken", data.accessToken)
-
-      // 3. Notify parent (App.tsx) of successful login
-      onLoginSuccess(data.user.email)
+      // 2. Hand the session to AuthProvider, which persists it and
+      //    updates the app state in one place.
+      onLoginSuccess(data.accessToken, data.user.email, data.user.roleId)
     } catch (error) {
       // Enhanced error handling for various backend responses
       const err: any = error;
