@@ -1,5 +1,13 @@
 import { CircleNotch, Warning } from "@phosphor-icons/react"
 import { Button } from "@/ui-shared/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/ui-shared/components/ui/dialog"
 
 interface ConfirmationDialogProps {
   isOpen: boolean
@@ -13,6 +21,14 @@ interface ConfirmationDialogProps {
   isLoading?: boolean
 }
 
+/**
+ * Yes/no confirmation modal.
+ *
+ * Built on the Radix Dialog primitive, which supplies focus trapping,
+ * Escape-to-close, scroll locking and the `aria-modal` wiring. While
+ * `isLoading` is true the dialog refuses to close, so a confirmed action
+ * cannot be dismissed midway.
+ */
 export default function ConfirmationDialog({
   isOpen,
   onClose,
@@ -24,52 +40,59 @@ export default function ConfirmationDialog({
   isDestructive = false,
   isLoading = false,
 }: ConfirmationDialogProps) {
-  if (!isOpen) return null
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
-        onClick={isLoading ? undefined : onClose}
-      />
-
-      {/* Dialog Content */}
-      <div className="relative w-full max-w-md bg-background border border-foreground/10 p-6 shadow-xl z-10 animate-in fade-in zoom-in-95 duration-200">
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        // Radix reports every close attempt — backdrop click, Escape, the X.
+        // Ignore them all while the action is in flight.
+        if (!open && !isLoading) onClose()
+      }}
+    >
+      <DialogContent
+        showCloseButton={!isLoading}
+        className="max-w-md gap-0 border border-foreground/10 bg-background p-6 shadow-xl sm:max-w-md"
+      >
         {/* Accent strip */}
-        <div className={`absolute top-0 left-0 right-0 h-1 ${isDestructive ? "bg-destructive" : "bg-brand"}`} />
+        <div
+          className={`absolute top-0 right-0 left-0 h-1 ${
+            isDestructive ? "bg-destructive" : "bg-brand"
+          }`}
+        />
 
-        <div className="flex gap-4 items-start">
-          <div className={`flex size-10 items-center justify-center shrink-0 rounded-none ${isDestructive ? "bg-destructive/10 text-destructive" : "bg-brand/10 text-brand"}`}>
+        <div className="flex items-start gap-4">
+          <div
+            className={`flex size-10 shrink-0 items-center justify-center rounded-none ${
+              isDestructive ? "bg-destructive/10 text-destructive" : "bg-brand/10 text-brand"
+            }`}
+          >
             <Warning size={20} weight="bold" />
           </div>
-          <div className="space-y-2 flex-1">
-            <h3 className="text-sm font-bold uppercase tracking-tight text-foreground">
+
+          <DialogHeader className="flex-1 space-y-2 text-left">
+            <DialogTitle className="text-sm font-bold tracking-tight text-foreground uppercase">
               {title}
-            </h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            </DialogTitle>
+            <DialogDescription className="text-xs leading-relaxed text-muted-foreground">
               {message}
-            </p>
-          </div>
+            </DialogDescription>
+          </DialogHeader>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-foreground/10">
+        <DialogFooter className="mt-6 flex-row justify-end gap-3 border-t border-foreground/10 pt-4">
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isLoading}
-            className="h-9 px-4 text-xs font-bold uppercase tracking-wider border-foreground/20 hover:bg-secondary/40 transition-colors"
+            className="h-9 rounded-none border-foreground/20 px-4 text-xs font-bold tracking-wider uppercase transition-colors hover:bg-secondary/40"
           >
             {cancelLabel}
           </Button>
           <Button
             onClick={onConfirm}
             disabled={isLoading}
-            className={`h-9 px-4 text-xs font-bold uppercase tracking-wider text-white border-none cursor-pointer transition-colors ${
-              isDestructive 
-                ? "bg-destructive hover:bg-destructive/90" 
-                : "bg-brand hover:bg-brand/90"
+            className={`h-9 cursor-pointer rounded-none border-none px-4 text-xs font-bold tracking-wider text-white uppercase transition-colors ${
+              isDestructive ? "bg-destructive hover:bg-destructive/90" : "bg-brand hover:bg-brand/90"
             }`}
           >
             {isLoading ? (
@@ -81,8 +104,8 @@ export default function ConfirmationDialog({
               confirmLabel
             )}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
