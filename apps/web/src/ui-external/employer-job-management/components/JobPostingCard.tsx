@@ -3,6 +3,7 @@ import { Button } from "@/ui-shared/components/ui/button"
 import type { MyJobListItemDto } from "@/client/types.gen"
 import JobStatusBadge, { type JobStatus } from "./JobStatusBadge"
 import { getAvailableActions, type JobAction } from "../jobActions"
+import { formatDate, formatDeadline, isPastDeadline } from "@/ui-shared/format/DateFormat"
 
 interface JobPostingCardProps {
   job: MyJobListItemDto
@@ -17,16 +18,6 @@ const ACTION_LABELS: Record<JobAction, string> = {
   DELETE: "Delete",
 }
 
-function formatDate(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return "—"
-  return date.toLocaleDateString(undefined, {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  })
-}
-
 function formatEmploymentType(value: string) {
   return value
     .split("_")
@@ -36,7 +27,7 @@ function formatEmploymentType(value: string) {
 
 export default function JobPostingCard({ job, onView, onAction }: JobPostingCardProps) {
   const actions = getAvailableActions(job.status as JobStatus)
-  const isDeadlinePassed = new Date(job.deadline).getTime() < Date.now()
+  const deadlinePassed = isPastDeadline(job.deadline)
 
   return (
     <div className="group border border-foreground/10 bg-card p-5 transition-all duration-300 hover:border-brand/40">
@@ -61,11 +52,11 @@ export default function JobPostingCard({ job, onView, onAction }: JobPostingCard
             </span>
             <span
               className={`inline-flex items-center gap-1.5 ${
-                isDeadlinePassed ? "text-orange-600" : ""
+                deadlinePassed ? "text-orange-600" : ""
               }`}
             >
               <CalendarBlank size={13} />
-              Deadline {formatDate(job.deadline)}
+              Deadline {formatDeadline(job.deadline)}
             </span>
           </div>
 
