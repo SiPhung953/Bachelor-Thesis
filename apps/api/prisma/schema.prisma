@@ -27,6 +27,7 @@ model User {
   userJobPreference   userJobPreference?
   resumes             Resume[]
   applications        Application[]
+  logs                Log[]
 
   @@map("users")
 }
@@ -170,6 +171,24 @@ model Application {
   @@map("applications")
 }
 
+model Log {
+  id         String        @id @default(uuid())
+  actorId    String?       @map("actor_id")
+  action     LogAction
+  targetType LogTargetType @map("target_type")
+  targetId   String?       @map("target_id")
+  message    String
+  level      LogLevel
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  user User? @relation(fields: [actorId], references: [id])
+
+  @@index([targetType, targetId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("logs")
+}
+
 enum UserStatus {
   ACTIVE
   BANNED
@@ -212,4 +231,65 @@ enum ApplicationStatus {
   ACCEPTED
   REJECTED
   WITHDRAWN
+}
+
+enum LogTargetType {
+  USER
+  JOB
+  APPLICATION
+  RESUME
+  COMPANY
+  AUTH
+  SYSTEM
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+}
+
+enum LogAction {
+  // User / Authentication
+  USER_REGISTERED
+  USER_LOGGED_IN
+  USER_LOGGED_OUT
+  USER_LOGIN_FAILED
+  USER_BANNED
+  USER_UNBANNED
+  PASSWORD_RESET_REQUESTED
+  PASSWORD_RESET_COMPLETED
+  PASSWORD_CHANGED
+
+  // Company
+  COMPANY_CREATED
+  COMPANY_UPDATED
+
+  // Job
+  JOB_CREATED
+  JOB_UPDATED
+  JOB_APPROVED
+  JOB_REJECTED
+  JOB_REOPENED
+  JOB_CLOSED
+  JOB_DELETED
+  JOB_EXPIRED
+
+  // Application
+  APPLICATION_SUBMITTED
+  APPLICATION_UNDER_REVIEW
+  APPLICATION_STATUS_UPDATED
+  APPLICATION_WITHDRAWN
+
+  // Resume
+  RESUME_UPLOADED
+  RESUME_DELETED
+
+  // Profile
+  PROFILE_UPDATED
+  AVATAR_CHANGED
+  JOB_PREFERENCE_UPDATED
+
+  // System
+  SYSTEM_ERROR
 }
