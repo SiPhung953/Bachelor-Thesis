@@ -6,7 +6,7 @@
   "scripts": {
     "dev:web": "pnpm --filter web dev",
     "dev:api": "pnpm --filter api dev",
-    "lint": "eslint .",
+    "lint": "pnpm -r lint",
     "format": "prettier --write ."
   },
   "keywords": [],

@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Create .env and append DATABASE_UTL
+      - name: Create .env and append DATABASE_URL
         working-directory: apps/api
         run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
 
