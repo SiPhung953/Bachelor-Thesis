@@ -1,9 +1,11 @@
+import { EmploymentType } from '../../api-shared/type/EmploymentType';
+
 export interface UpdateJobPostingResponse {
     jobId: string;
     title: string;
     description: string;
     requirement: string;
-    employmentType: "ON_SITE" | "REMOTE" | "HYBRID";
+    employmentType: EmploymentType;
     location: string;
     deadline: Date;
     status: "PENDING_APPROVAL";

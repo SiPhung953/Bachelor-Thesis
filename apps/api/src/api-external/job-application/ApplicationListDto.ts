@@ -1,3 +1,5 @@
+import { ApplicationStatus } from '../../api-shared/type/ApplicationStatus';
+
 export interface ApplicationListDto {
     applicationId: string;
     
@@ -7,12 +9,7 @@ export interface ApplicationListDto {
     companyId: string;
     companyName: string;
 
-    status: 
-    | "SUBMITTED" 
-    | "UNDER_REVIEW"
-    | "ACCEPTED"
-    | "REJECTED"
-    | "WITHDRAWN";
+    status: ApplicationStatus;
 
     appliedAt: Date;
 }

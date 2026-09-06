@@ -1,0 +1,1 @@
+export type JobStatus = "PENDING_APPROVAL" | "ACTIVE" | "REJECTED" | "CLOSED" | "EXPIRED" | "DELETED"

@@ -1,9 +1,11 @@
+import { EmploymentType } from '../../api-shared/type/EmploymentType';
+
 export interface GetJobDetailResponse {
     id: string;
     title: string;
     description: string;
     location: string;
-    employmentType: "ON_SITE" | "REMOTE" | "HYBRID";
+    employmentType: EmploymentType;
 
     company: {
         id: string;

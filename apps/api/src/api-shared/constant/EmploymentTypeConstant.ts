@@ -1,1 +1,0 @@
-export type EmploymentType = "ON-SITE" | "REMOTE" | "HYBRID"

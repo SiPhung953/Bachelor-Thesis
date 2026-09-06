@@ -1,4 +1,4 @@
-import { EmploymentType } from "../../generated/prisma/enums";
+import { EmploymentType } from '../../api-shared/type/EmploymentType';
 
 export interface CompanyJobListItemDto {
     id: string;

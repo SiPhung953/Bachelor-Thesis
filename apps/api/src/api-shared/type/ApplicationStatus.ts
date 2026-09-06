@@ -1,0 +1,1 @@
+export type ApplicationStatus = "SUBMITTED" | "UNDER_REVIEW"| "ACCEPTED" | "REJECTED" | "WITHDRAWN"

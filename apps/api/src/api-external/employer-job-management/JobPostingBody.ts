@@ -1,8 +1,10 @@
+import { EmploymentType } from '../../api-shared/type/EmploymentType';
+
 export interface JobPostingBody {
     title: string;
     description: string;
     requirement: string;
-    employmentType: "ON_SITE" | "REMOTE" | "HYBRID";
+    employmentType: EmploymentType;
     location: string;
     deadline: Date;
 }

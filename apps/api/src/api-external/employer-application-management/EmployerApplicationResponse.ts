@@ -1,3 +1,5 @@
+import { ApplicationStatus } from '../../api-shared/type/ApplicationStatus';
+
 export interface EmployerApplicationResponse {
     applicationId: string;
     
@@ -18,7 +20,7 @@ export interface EmployerApplicationResponse {
     jobTitle: string;
 
     // Application info
-    applicationStatus: "SUBMITTED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED" | "WITHDRAWN";
+    applicationStatus: ApplicationStatus;
     appliedAt: Date;
     underReviewAt?: Date;
     withdrawnAt?: Date;
