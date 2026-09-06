@@ -110,7 +110,7 @@ export type JobListItemDto = {
     id: string;
     title: string;
     description?: string;
-    employmentType: string;
+    employmentType: EmploymentType;
     location: string;
 };
 
@@ -128,7 +128,7 @@ export type GetJobDetailResponse = {
     title: string;
     description: string;
     location: string;
-    employmentType: 'ON_SITE' | 'REMOTE' | 'HYBRID';
+    employmentType: EmploymentType;
     company: {
         name: string;
         id: string;
@@ -146,28 +146,32 @@ export type ApplyJobRequest = {
     resumeId: string;
 };
 
+export type ApplicationStatus = 'SUBMITTED' | 'UNDER_REVIEW' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+
 export type ApplicationListDto = {
     applicationId: string;
     jobId: string;
     jobTitle: string;
     companyId: string;
     companyName: string;
-    status: 'SUBMITTED' | 'UNDER_REVIEW' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+    status: ApplicationStatus;
     appliedAt: string;
 };
 
 export type WithdrawApplicationResponse = {
-    status: string;
+    status: ApplicationStatus;
     withdrawnAt: string;
     message: string;
 };
 
+export type JobStatus = 'PENDING_APPROVAL' | 'ACTIVE' | 'REJECTED' | 'CLOSED' | 'EXPIRED' | 'DELETED';
+
 export type MyJobListItemDto = {
     jobId: string;
     title: string;
-    employmentType: string;
+    employmentType: EmploymentType;
     location: string;
-    status: 'PENDING_APPROVAL' | 'ACTIVE' | 'REJECTED' | 'CLOSED' | 'EXPIRED' | 'DELETED';
+    status: JobStatus;
     deadline: string;
     createdAt: string;
     closedAt?: string;
@@ -183,9 +187,9 @@ export type GetMyJobDetailResponse = {
     title: string;
     description: string;
     requirement: string;
-    employmentType: 'ON_SITE' | 'REMOTE' | 'HYBRID';
+    employmentType: EmploymentType;
     location: string;
-    status: 'PENDING_APPROVAL' | 'ACTIVE' | 'REJECTED' | 'CLOSED' | 'EXPIRED' | 'DELETED';
+    status: JobStatus;
     deadline: string;
     createdAt: string;
     updatedAt: string;
@@ -201,7 +205,7 @@ export type CreateJobPostingResponse = {
     title: string;
     description: string;
     requirement: string;
-    employmentType: 'ON_SITE' | 'REMOTE' | 'HYBRID';
+    employmentType: EmploymentType;
     location: string;
     deadline: string;
     status: 'PENDING_APPROVAL';
@@ -212,7 +216,7 @@ export type JobPostingBody = {
     title: string;
     description: string;
     requirement: string;
-    employmentType: 'ON_SITE' | 'REMOTE' | 'HYBRID';
+    employmentType: EmploymentType;
     location: string;
     deadline: string;
 };
@@ -224,7 +228,7 @@ export type UpdateJobPostingResponse = {
     title: string;
     description: string;
     requirement: string;
-    employmentType: 'ON_SITE' | 'REMOTE' | 'HYBRID';
+    employmentType: EmploymentType;
     location: string;
     deadline: string;
     status: 'PENDING_APPROVAL';
@@ -282,7 +286,7 @@ export type EmployerApplicationListItemDto = {
     candidateEmail: string;
     resumeId: string;
     resumeTitle: string;
-    applicationStatus: 'SUBMITTED' | 'UNDER_REVIEW' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+    applicationStatus: ApplicationStatus;
     appliedAt: string;
 };
 
@@ -302,7 +306,7 @@ export type EmployerApplicationResponse = {
     resumeFileUrl: string;
     jobId: string;
     jobTitle: string;
-    applicationStatus: 'SUBMITTED' | 'UNDER_REVIEW' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+    applicationStatus: ApplicationStatus;
     appliedAt: string;
     underReviewAt?: string;
     withdrawnAt?: string;
